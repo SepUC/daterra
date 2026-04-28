@@ -117,7 +117,7 @@ input, select, textarea {
 
 		a:hover {
 			border-bottom-color: transparent !important;
-			color: #6bd4c8;
+			color: #6bd479;
 		}
 
 	strong, b {
@@ -3027,15 +3027,15 @@ input, select, textarea {
 				padding-left: 0;
 			}
 
-			#header .actions:after {
-				background: #ffffff;
+			/*#header .actions:after {
+				background: #ff0000;
 				content: '';
 				height: 100vh;
 				left: 50%;
 				position: absolute;
 				top: 100%;
 				width: 1px;
-			}
+			}	LINEA RANDOM DE BOTONES*/
 
 		#header .inner {
 			-moz-transition: -moz-transform 1.5s ease, opacity 2s ease;
