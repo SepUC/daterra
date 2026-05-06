@@ -14,8 +14,8 @@ function Start() {
 					<p>Texto de prueba no sé qué poner acá pero pa saber<br />
 					Texto de prueba no sé qué poner acá pero pa saber pt2</p>
 					<ul class="actions special">
-						<li><a href="#one" class="button scrolly">Regístrate</a></li>
-						<li><a href="#two" class="button scrolly">Aprende más</a></li>
+						<li><a href="/register" class="button scrolly">Regístrate</a></li>
+						<li><a href="/about" class="button scrolly">Aprende más</a></li>
 					</ul>
 				</div>
 			</section>

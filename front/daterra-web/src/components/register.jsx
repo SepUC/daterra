@@ -5,20 +5,22 @@ import { useAuth } from '../context/AuthContext';
 import '../assets/css/main.css';
 import '../assets/css/fontawesome-all.min.css';
 
-function Login() {
+function Register() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     
-    // Validación básica
-    if (!email || !password) {
+    // Validaciones
+    if (!name || !email || !password || !confirmPassword) {
       setError('Por favor completa todos los campos');
       return;
     }
@@ -28,14 +30,24 @@ function Login() {
       return;
     }
 
+    if (password.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await login(email, password);
-      console.log('Login exitoso');
+      await register(name, email, password);
+      console.log('Registro exitoso');
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message || 'Error en login. Por favor intenta de nuevo.');
+      setError(err.message || 'Error en registro. Por favor intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
@@ -45,9 +57,9 @@ function Login() {
     <>
       <section id="header">
         <div className="inner" style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', padding: '4em 2em', borderRadius: '15px', maxWidth: '600px', margin: '0 auto' }}>
-          <span className="icon solid major fa-lock" style={{ color: '#444444' }}></span>
-          <h1><strong style={{ color: '#444444' }}>Iniciar Sesión</strong></h1>
-          <p style={{ color: '#444444' }}>Ingresa a tu cuenta de Daterra</p>
+          <span className="icon solid major fa-user-plus" style={{ color: '#444444' }}></span>
+          <h1><strong style={{ color: '#444444' }}>Registro</strong></h1>
+          <p style={{ color: '#444444' }}>Crea tu cuenta en Daterra</p>
           
           <form onSubmit={handleSubmit} style={{ maxWidth: '400px', margin: '2em auto'}}>
             {error && (
@@ -66,6 +78,22 @@ function Login() {
             <div className="row gtr-uniform">
               <div className="col-12" style={{ marginBottom: '1.5em' }}>
                 <input 
+                  type="text" 
+                  name="name" 
+                  id="name" 
+                  placeholder="Nombre Completo" 
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setError('');
+                  }}
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', color: '#000' }}
+                  disabled={isLoading}
+                  required 
+                />
+              </div>
+              <div className="col-12" style={{ marginBottom: '1.5em' }}>
+                <input 
                   type="email" 
                   name="email" 
                   id="email" 
@@ -80,7 +108,7 @@ function Login() {
                   required 
                 />
               </div>
-              <div className="col-12" style={{ marginBottom: '2em', height: '1em' }}>
+              <div className="col-12" style={{ marginBottom: '1.5em', height: '1em' }}>
                 <input 
                   type="password" 
                   name="password" 
@@ -96,11 +124,27 @@ function Login() {
                   required 
                 />
               </div>
+              <div className="col-12" style={{ marginBottom: '2em', height: '1em' }}>
+                <input 
+                  type="password" 
+                  name="confirmPassword" 
+                  id="confirmPassword" 
+                  placeholder="Confirmar Contraseña" 
+                  value={confirmPassword}
+                  onChange={(e) => {
+                    setConfirmPassword(e.target.value);
+                    setError('');
+                  }}
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', color: '#000' }}
+                  disabled={isLoading}
+                  required 
+                />
+              </div>
               <div className="col-12">
                 <ul className="actions special">
                   <li>
                     <button type="submit" className="button primary" disabled={isLoading}>
-                      {isLoading ? 'Cargando...' : 'Ingresar'}
+                      {isLoading ? 'Cargando...' : 'Registrarse'}
                     </button>
                   </li>
                 </ul>
@@ -109,7 +153,7 @@ function Login() {
           </form>
 
           <div style={{ marginTop: '3em' }}>
-            <p style={{ color: '#444444' }}>¿No tienes una cuenta? <Link to="/register" style={{ color: '#444444', textDecoration: 'underline' }}>Regístrate aquí</Link></p>
+            <p style={{ color: '#444444' }}>¿Ya tienes una cuenta? <Link to="/login" style={{ color: '#444444', textDecoration: 'underline' }}>Inicia sesión aquí</Link></p>
           </div>
 
           <div style={{ marginTop: '2em', padding: '1em', backgroundColor: 'rgba(76, 175, 80, 0.1)', borderRadius: '8px', borderLeft: '4px solid #4CAF50' }}>
@@ -123,4 +167,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;
