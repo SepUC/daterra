@@ -1,33 +1,43 @@
 package com.daterra.api.daterra.controller;
+
+import com.daterra.api.daterra.dto.LoginRequest;
 import com.daterra.api.daterra.model.Usuario;
 import com.daterra.api.daterra.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/usuarios")
-@CrossOrigin(origins="*")
+@RequestMapping("/api/auth") // Cambiamos la ruta a algo más estándar para seguridad
 public class UsuarioController {
+
     @Autowired
-    private UsuarioRepository usuarioRepository; // Esta es tu variable (el objeto)
+    private UsuarioRepository usuarioRepository;
 
-    //Ruta para ver los usuarios
-    @GetMapping
-    public List<Usuario> getAllUsuarios() {
-        // USAMOS LA VARIABLE (minúscula)
-        return usuarioRepository.findAll();
-    }
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginData) {
+        // 1. Buscamos al usuario por el email (que en la DB es email_usu)
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(loginData.getEmail());
 
-    //Ruta para crear un usuario
-    @PostMapping("/prueba")
-    public Usuario crearPrueba(){
-        Usuario u = new Usuario();
-        u.setNombre("Juan");
-        u.setEmail("Juanexample@email.com");
-        // USAMOS LA VARIABLE (minúscula)
-        return usuarioRepository.save(u);
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+
+            // 2. Verificamos la contraseña (password_usu en la DB)
+            // IMPORTANTE: Aquí comparamos texto plano por ahora, pero luego deberías usar BCrypt
+            if (usuario.getPassword().equals(loginData.getPassword())) {
+
+                // Si todo está bien, devolvemos el usuario (puedes elegir no mandar la password al front)
+                usuario.setPassword(null);
+                return ResponseEntity.ok(usuario);
+
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Contraseña incorrecta");
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
     }
 }
