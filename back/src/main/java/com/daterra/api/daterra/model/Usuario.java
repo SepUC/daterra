@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "Usuario") // Asegúrate de que este sea el nombre real de tu tabla en AWS
+@Table(name = "`USUARIO`", schema = "Daterra") // Asegúrate de que este sea el nombre real de tu tabla en AWS
 public class Usuario {
 
     @Id
@@ -39,7 +39,9 @@ public class Usuario {
     @Column(name = "password_usu")
     private String password;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_comuna") // Así se llama la columna en la tabla usuarios
     private Comuna comuna;
+
+
 }

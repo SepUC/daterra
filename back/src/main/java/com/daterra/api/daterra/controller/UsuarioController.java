@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+/*import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth") // Cambiamos la ruta a algo más estándar para seguridad
@@ -40,3 +40,4 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
     }
 }
+*/
