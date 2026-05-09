@@ -6,7 +6,8 @@ import '../assets/css/main.css';
 import '../assets/css/fontawesome-all.min.css';
 
 function Login() {
-  const [email, setEmail] = useState('');
+  // 1. Cambiamos email por runUsuario para que coincida con tu Java
+  const [runUsuario, setRunUsuario] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -16,110 +17,96 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
-    // Validación básica
-    if (!email || !password) {
-      setError('Por favor completa todos los campos');
-      return;
-    }
 
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Por favor ingresa un correo válido');
+    // Validación básica de RUN
+    if (!runUsuario || !password) {
+      setError('Por favor completa todos los campos');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      // 2. Llamamos a la función login del AuthContext
+      // Pasamos el RUN y el Password
+      await login(runUsuario, password);
       console.log('Login exitoso');
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message || 'Error en login. Por favor intenta de nuevo.');
+      // 3. Manejo de errores específicos (RUN no encontrado, contraseña mal, etc)
+      setError(err.message || 'Credenciales inválidas. Intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <>
-      <section id="header">
-        <div className="inner" style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', padding: '4em 2em', borderRadius: '15px', maxWidth: '600px', margin: '0 auto' }}>
-          <span className="icon solid major fa-lock" style={{ color: '#444444' }}></span>
-          <h1><strong style={{ color: '#444444' }}>Iniciar Sesión</strong></h1>
-          <p style={{ color: '#444444' }}>Ingresa a tu cuenta de Daterra</p>
-          
-          <form onSubmit={handleSubmit} style={{ maxWidth: '400px', margin: '2em auto'}}>
-            {error && (
-              <div style={{ 
-                backgroundColor: '#f8d7da', 
-                color: '#721c24', 
-                padding: '1em', 
-                borderRadius: '8px', 
-                marginBottom: '1.5em',
-                border: '1px solid #f5c6cb'
-              }}>
-                ⚠️ {error}
+      <>
+        <section id="header">
+          <div className="inner" style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', padding: '4em 2em', borderRadius: '15px', maxWidth: '600px', margin: '0 auto' }}>
+            <span className="icon solid major fa-lock" style={{ color: '#444444' }}></span>
+            <h1><strong style={{ color: '#444444' }}>Iniciar Sesión</strong></h1>
+            <p style={{ color: '#444444' }}>Ingresa a tu cuenta de Daterra</p>
+
+            <form onSubmit={handleSubmit} style={{ maxWidth: '400px', margin: '2em auto'}}>
+              {error && (
+                  <div style={{ backgroundColor: '#f8d7da', color: '#721c24', padding: '1em', borderRadius: '8px', marginBottom: '1.5em', border: '1px solid #f5c6cb' }}>
+                    ⚠️ {error}
+                  </div>
+              )}
+
+              <div className="row gtr-uniform">
+                <div className="col-12" style={{ marginBottom: '1.5em' }}>
+                  {/* 4. Cambiamos el input de email a número para el RUN */}
+                  <input
+                      type="number"
+                      name="runUsuario"
+                      id="runUsuario"
+                      placeholder="RUN (sin puntos ni guion)"
+                      value={runUsuario}
+                      onChange={(e) => {
+                        setRunUsuario(e.target.value);
+                        setError('');
+                      }}
+                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', color: '#000' }}
+                      disabled={isLoading}
+                      required
+                  />
+                </div>
+                <div className="col-12" style={{ marginBottom: '2em', height: '1.5em' }}>
+                  <input
+                      type="password"
+                      name="password"
+                      id="password"
+                      placeholder="Contraseña"
+                      value={password}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        setError('');
+                      }}
+                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', color: '#000' }}
+                      disabled={isLoading}
+                      required
+                  />
+                </div>
+                <div className="col-12">
+                  <ul className="actions special">
+                    <li>
+                      <button type="submit" className="button primary" disabled={isLoading}>
+                        {isLoading ? 'Cargando...' : 'Ingresar'}
+                      </button>
+                    </li>
+                  </ul>
+                </div>
               </div>
-            )}
-            
-            <div className="row gtr-uniform">
-              <div className="col-12" style={{ marginBottom: '1.5em' }}>
-                <input 
-                  type="email" 
-                  name="email" 
-                  id="email" 
-                  placeholder="Correo Electrónico" 
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setError('');
-                  }}
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', color: '#000' }}
-                  disabled={isLoading}
-                  required 
-                />
-              </div>
-              <div className="col-12" style={{ marginBottom: '2em', height: '1em' }}>
-                <input 
-                  type="password" 
-                  name="password" 
-                  id="password" 
-                  placeholder="Contraseña" 
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setError('');
-                  }}
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', color: '#000' }}
-                  disabled={isLoading}
-                  required 
-                />
-              </div>
-              <div className="col-12">
-                <ul className="actions special">
-                  <li>
-                    <button type="submit" className="button primary" disabled={isLoading}>
-                      {isLoading ? 'Cargando...' : 'Ingresar'}
-                    </button>
-                  </li>
-                </ul>
-              </div>
+            </form>
+
+            <div style={{ marginTop: '3em' }}>
+              <p style={{ color: '#444444' }}>¿No tienes una cuenta? <Link to="/register" style={{ color: '#444444', textDecoration: 'underline' }}>Regístrate aquí</Link></p>
             </div>
-          </form>
-
-          <div style={{ marginTop: '3em' }}>
-            <p style={{ color: '#444444' }}>¿No tienes una cuenta? <Link to="/register" style={{ color: '#444444', textDecoration: 'underline' }}>Regístrate aquí</Link></p>
           </div>
-
-          <div style={{ marginTop: '2em', padding: '1em', backgroundColor: 'rgba(76, 175, 80, 0.1)', borderRadius: '8px', borderLeft: '4px solid #4CAF50' }}>
-            <p style={{ margin: '0', fontSize: '0.85em', color: '#555' }}>
-              💡 <strong>Para testing:</strong> Usa el helper en la esquina inferior derecha para ver credenciales de prueba
-            </p>
-          </div>
-        </div>
-      </section>
-    </>
+        </section>
+      </>
   );
 }
 
