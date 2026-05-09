@@ -2,168 +2,114 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-import '../assets/css/main.css';
-import '../assets/css/fontawesome-all.min.css';
-
 function Register() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [formData, setFormData] = useState({
+    runUsuario: '',
+    dvrunUsuario: '',
+    primerNombre: '',
+    segundoNombre: '',
+    primerApellido: '',
+    segundoApellido: '',
+    email: '',
+    direccion: '',
+    telefono: '',
+    password: '',
+    idTipoUsu: 2, // 2 = Comun (General)
+    idComuna: 1,  // 1 = Santiago (Ajustar según tu DB)
+    confirmPassword: ''
+  });
+
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { register } = useAuth();
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const numericFields = ['idTipoUsu', 'runUsuario', 'idComuna'];
+
+    setFormData({
+      ...formData,
+      [name]: numericFields.includes(name) ? parseInt(value) || '' : value
+    });
+    setError('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    
-    // Validaciones
-    if (!name || !email || !password || !confirmPassword) {
-      setError('Por favor completa todos los campos');
-      return;
-    }
-
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Por favor ingresa un correo válido');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
-      return;
-    }
-
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       setError('Las contraseñas no coinciden');
       return;
     }
 
     setIsLoading(true);
-
     try {
-      await register(name, email, password);
-      console.log('Registro exitoso');
+      const { confirmPassword, ...datosParaEnviar } = formData;
+      await register(datosParaEnviar);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message || 'Error en registro. Por favor intenta de nuevo.');
+      setError(typeof err === 'string' ? err : 'Error al registrar el usuario.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <>
       <section id="header">
-        <div className="inner" style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', padding: '4em 2em', borderRadius: '15px', maxWidth: '600px', margin: '0 auto' }}>
-          <span className="icon solid major fa-user-plus" style={{ color: '#444444' }}></span>
-          <h1><strong style={{ color: '#444444' }}>Registro</strong></h1>
-          <p style={{ color: '#444444' }}>Crea tu cuenta en Daterra</p>
-          
-          <form onSubmit={handleSubmit} style={{ maxWidth: '400px', margin: '2em auto'}}>
-            {error && (
-              <div style={{ 
-                backgroundColor: '#f8d7da', 
-                color: '#721c24', 
-                padding: '1em', 
-                borderRadius: '8px', 
-                marginBottom: '1.5em',
-                border: '1px solid #f5c6cb'
-              }}>
-                ⚠️ {error}
-              </div>
-            )}
-            
+        <div className="inner" style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', padding: '3em', borderRadius: '15px', maxWidth: '700px', margin: '2em auto' }}>
+          <h1 style={{ color: '#444' }}>Registro Daterra</h1>
+
+          <form onSubmit={handleSubmit}>
+            {error && <div style={{ color: 'red', marginBottom: '1em' }}>⚠️ {error}</div>}
+
             <div className="row gtr-uniform">
-              <div className="col-12" style={{ marginBottom: '1.5em' }}>
-                <input 
-                  type="text" 
-                  name="name" 
-                  id="name" 
-                  placeholder="Nombre Completo" 
-                  value={name}
-                  onChange={(e) => {
-                    setName(e.target.value);
-                    setError('');
-                  }}
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', color: '#000' }}
-                  disabled={isLoading}
-                  required 
-                />
+              {/* RUN Y DV */}
+              <div className="col-8"><input type="number" name="runUsuario" placeholder="RUN" onChange={handleChange} required /></div>
+              <div className="col-4"><input type="text" name="dvrunUsuario" placeholder="DV" maxLength="1" onChange={handleChange} required /></div>
+
+              {/* NOMBRES */}
+              <div className="col-6"><input type="text" name="primerNombre" placeholder="Primer Nombre" onChange={handleChange} required /></div>
+              <div className="col-6"><input type="text" name="segundoNombre" placeholder="Segundo Nombre" onChange={handleChange} /></div>
+
+              {/* APELLIDOS */}
+              <div className="col-6"><input type="text" name="primerApellido" placeholder="Apellido Paterno" onChange={handleChange} required /></div>
+              <div className="col-6"><input type="text" name="segundoApellido" placeholder="Apellido Materno" onChange={handleChange} /></div>
+
+              {/* CONTACTO */}
+              <div className="col-12"><input type="text" name="direccion" placeholder="Dirección" onChange={handleChange} /></div>
+              <div className="col-12"><input type="text" name="telefono" placeholder="Teléfono (+569...)" onChange={handleChange} /></div>
+
+              <div className="col-12"><input type="email" name="email" placeholder="Correo Electrónico" onChange={handleChange} required /></div>
+
+              {/* SELECTORES */}
+              <div className="col-6">
+                <label style={{color: '#666', fontSize: '0.8em'}}>Tipo de Usuario</label>
+                <select name="idTipoUsu" value={formData.idTipoUsu} onChange={handleChange}>
+                  <option value={2}>General (Ciudadano)</option>
+                  <option value={1}>Municipal (Comuna)</option>
+                </select>
               </div>
-              <div className="col-12" style={{ marginBottom: '1.5em' }}>
-                <input 
-                  type="email" 
-                  name="email" 
-                  id="email" 
-                  placeholder="Correo Electrónico" 
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    setError('');
-                  }}
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', color: '#000' }}
-                  disabled={isLoading}
-                  required 
-                />
+              <div className="col-6">
+                <label style={{color: '#666', fontSize: '0.8em'}}>Comuna</label>
+                <select name="idComuna" value={formData.idComuna} onChange={handleChange}>
+                  <option value={1}>Santiago</option>
+                  <option value={2}>Puente Alto</option>
+                </select>
               </div>
-              <div className="col-12" style={{ marginBottom: '1.5em', height: '1em' }}>
-                <input 
-                  type="password" 
-                  name="password" 
-                  id="password" 
-                  placeholder="Contraseña" 
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    setError('');
-                  }}
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', color: '#000' }}
-                  disabled={isLoading}
-                  required 
-                />
-              </div>
-              <div className="col-12" style={{ marginBottom: '2em', height: '1em' }}>
-                <input 
-                  type="password" 
-                  name="confirmPassword" 
-                  id="confirmPassword" 
-                  placeholder="Confirmar Contraseña" 
-                  value={confirmPassword}
-                  onChange={(e) => {
-                    setConfirmPassword(e.target.value);
-                    setError('');
-                  }}
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', color: '#000' }}
-                  disabled={isLoading}
-                  required 
-                />
-              </div>
+
+              {/* PASSWORD */}
+              <div className="col-6"><input type="password" name="password" placeholder="Contraseña" onChange={handleChange} required /></div>
+              <div className="col-6"><input type="password" name="confirmPassword" placeholder="Confirmar" onChange={handleChange} required /></div>
+
               <div className="col-12">
-                <ul className="actions special">
-                  <li>
-                    <button type="submit" className="button primary" disabled={isLoading}>
-                      {isLoading ? 'Cargando...' : 'Registrarse'}
-                    </button>
-                  </li>
-                </ul>
+                <button type="submit" className="button primary fit" disabled={isLoading}>
+                  {isLoading ? 'Registrando...' : 'Crear Cuenta'}
+                </button>
               </div>
             </div>
           </form>
-
-          <div style={{ marginTop: '3em' }}>
-            <p style={{ color: '#444444' }}>¿Ya tienes una cuenta? <Link to="/login" style={{ color: '#444444', textDecoration: 'underline' }}>Inicia sesión aquí</Link></p>
-          </div>
-
-          <div style={{ marginTop: '2em', padding: '1em', backgroundColor: 'rgba(76, 175, 80, 0.1)', borderRadius: '8px', borderLeft: '4px solid #4CAF50' }}>
-            <p style={{ margin: '0', fontSize: '0.85em', color: '#555' }}>
-              💡 <strong>Para testing:</strong> Usa el helper en la esquina inferior derecha para ver credenciales de prueba
-            </p>
-          </div>
         </div>
       </section>
-    </>
   );
 }
 

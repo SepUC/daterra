@@ -39,6 +39,10 @@ public class Usuario {
     @Column(name = "password_usu")
     private String password;
 
+    @ManyToOne
+    @JoinColumn(name = "id_tipo_usu")
+    private TipoUsuario tipoUsuario;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_comuna") // Así se llama la columna en la tabla usuarios
     private Comuna comuna;

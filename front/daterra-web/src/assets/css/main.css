@@ -3510,3 +3510,28 @@ input, select, textarea {
 			}
 
 	}
+/* --- AÑADE ESTO AL FINAL PARA ARREGLAR LOS INPUTS --- */
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+select,
+textarea {
+	color: #000000 !important; /* Letra negra */
+	background-color: #ffffff !important; /* Fondo blanco */
+	border: solid 1px #ccc !important; /* Borde gris suave para que se vea el cuadro */
+}
+
+/* Para que el texto que escribes se vea negro mientras escribes */
+input:focus, select:focus, textarea:focus {
+	color: #000000 !important;
+	background-color: #ffffff !important;
+	border-color: #6bd479 !important; /* Borde verde al hacer clic */
+}
+
+/* Color del texto de sugerencia (Placeholder) */
+::placeholder {
+	color: #888888 !important;
+	opacity: 1;
+}
