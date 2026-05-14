@@ -27,13 +27,13 @@ export function AuthProvider({ children }) {
   /**
    * Login adaptado para Spring Boot (AWS)
    */
-  const login = async (runUsuario, password) => {
+  const login = async (email, password) => {
     setIsLoading(true);
     setError(null);
 
     try {
       // 2. Llamamos al servicio que usa Axios hacia http://localhost:8080/api/auth/login
-      const userData = await apiLogin(runUsuario, password);
+      const userData = await apiLogin(email, password);
 
       // 3. Guardamos el objeto usuario que viene de Java (Jose Vargas)
       localStorage.setItem('currentUser', JSON.stringify(userData));

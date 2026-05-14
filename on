@@ -1,0 +1,11 @@
+[33m0419cbb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mN_Branch-unificado[m[33m, [m[1;31morigin/N_Branch-unificado[m[33m)[m Configura backend y agrega axios al frontend
+Daterra-Front/front/daterra-web/package-lock.json
+Daterra-Front/front/daterra-web/package.json
+Daterra-Front/front/daterra-web/src/authService.js
+back/src/main/java/com/daterra/api/daterra/config/WebConfig.java
+back/src/main/java/com/daterra/api/daterra/dto/LoginRequest.java
+pom.xml
+src/main/java/com/daterra/api/daterra/controller/UsuarioController.java
+src/main/java/com/daterra/api/daterra/model/Usuario.java
+src/main/java/com/daterra/api/daterra/repository/UsuarioRepository.java
+src/main/resources/application.properties

@@ -5,11 +5,14 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "`USUARIO`", schema = "Daterra") // Asegúrate de que este sea el nombre real de tu tabla en AWS
+@Table(name = "`USUARIO`", schema = "Daterra")
 public class Usuario {
 
     @Id
-    @Column(name = "run_usu") // Coincide con la llave dorada de tu imagen
+    @Column(name = "email_usu")
+    private String email;
+
+    @Column(name = "run_usu")
     private Integer runUsuario;
 
     @Column(name = "dvrun_usu")
@@ -27,9 +30,6 @@ public class Usuario {
     @Column(name = "sapellido_usu")
     private String segundoApellido;
 
-    @Column(name = "email_usu")
-    private String email;
-
     @Column(name = "direccion_usu")
     private String direccion;
 
@@ -39,13 +39,24 @@ public class Usuario {
     @Column(name = "password_usu")
     private String password;
 
+    // --- SOLUCIÓN TIPO USUARIO ---
+    // Atributo para INSERTAR/ACTUALIZAR el ID que viene de React
+    @Column(name = "id_tipo_usu")
+    private Integer idTipoUsu;
+
+    // Relación para LEER la información completa del tipo
     @ManyToOne
-    @JoinColumn(name = "id_tipo_usu")
+    @JoinColumn(name = "id_tipo_usu", insertable = false, updatable = false)
     private TipoUsuario tipoUsuario;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_comuna") // Así se llama la columna en la tabla usuarios
+
+    // --- SOLUCIÓN COMUNA ---
+    // Atributo para INSERTAR/ACTUALIZAR el ID que viene de React
+    @Column(name = "id_comuna")
+    private Integer idComuna;
+
+    // Relación para LEER la información completa de la comuna
+    @ManyToOne
+    @JoinColumn(name = "id_comuna", insertable = false, updatable = false)
     private Comuna comuna;
-
-
 }
