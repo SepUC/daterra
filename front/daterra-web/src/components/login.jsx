@@ -6,9 +6,9 @@ import '../assets/css/main.css';
 import '../assets/css/fontawesome-all.min.css';
 
 function Login() {
-  // 1. Cambiamos email por runUsuario para que coincida con tu Java
-  const [runUsuario, setRunUsuario] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -18,8 +18,8 @@ function Login() {
     e.preventDefault();
     setError('');
 
-    // Validación básica de RUN
-    if (!runUsuario || !password) {
+    // Validación básica
+    if (!email || !password) {
       setError('Por favor completa todos los campos');
       return;
     }
@@ -27,9 +27,9 @@ function Login() {
     setIsLoading(true);
 
     try {
-      // 2. Llamamos a la función login del AuthContext
-      // Pasamos el RUN y el Password
-      await login(runUsuario, password);
+      // Llamamos a la función login del AuthContext
+      // Pasamos el email y el password
+      await login(email, password);
       console.log('Login exitoso');
       navigate('/dashboard');
     } catch (err) {
@@ -57,15 +57,14 @@ function Login() {
 
               <div className="row gtr-uniform">
                 <div className="col-12" style={{ marginBottom: '1.5em' }}>
-                  {/* 4. Cambiamos el input de email a número para el RUN */}
                   <input
-                      type="number"
-                      name="runUsuario"
-                      id="runUsuario"
-                      placeholder="RUN (sin puntos ni guion)"
-                      value={runUsuario}
+                      type="email"
+                      name="email"
+                      id="email"
+                      placeholder="Correo electrónico"
+                      value={email}
                       onChange={(e) => {
-                        setRunUsuario(e.target.value);
+                        setEmail(e.target.value);
                         setError('');
                       }}
                       style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', color: '#000' }}
@@ -74,20 +73,28 @@ function Login() {
                   />
                 </div>
                 <div className="col-12" style={{ marginBottom: '2em', height: '1.5em' }}>
-                  <input
-                      type="password"
-                      name="password"
-                      id="password"
-                      placeholder="Contraseña"
-                      value={password}
-                      onChange={(e) => {
-                        setPassword(e.target.value);
-                        setError('');
-                      }}
-                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', color: '#000' }}
-                      disabled={isLoading}
-                      required
-                  />
+                  <div style={{ position: 'relative' }}>
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        id="password"
+                        placeholder="Contraseña"
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          setError('');
+                        }}
+                        style={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', color: '#000', paddingRight: '40px' }}
+                        disabled={isLoading}
+                        required
+                    />
+                    <span 
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{ position: 'absolute', right: '15px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: '#666', zIndex: 10 }}
+                    >
+                      <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                    </span>
+                  </div>
                 </div>
                 <div className="col-12">
                   <ul className="actions special">

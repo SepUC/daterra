@@ -9,7 +9,10 @@ import lombok.Data;
 public class Usuario {
 
     @Id
-    @Column(name = "run_usu") // Coincide con la llave dorada de tu imagen
+    @Column(name = "email_usu")
+    private String email;
+
+    @Column(name = "run_usu")
     private Integer runUsuario;
 
     @Column(name = "dvrun_usu")
@@ -27,9 +30,6 @@ public class Usuario {
     @Column(name = "sapellido_usu")
     private String segundoApellido;
 
-    @Column(name = "email_usu")
-    private String email;
-
     @Column(name = "direccion_usu")
     private String direccion;
 
@@ -43,7 +43,7 @@ public class Usuario {
     @JoinColumn(name = "id_tipo_usu")
     private TipoUsuario tipoUsuario;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "id_comuna") // Así se llama la columna en la tabla usuarios
     private Comuna comuna;
 

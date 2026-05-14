@@ -11,8 +11,8 @@ import Start from './components/start.jsx';
 import Login from './components/login.jsx';
 import Register from './components/register.jsx';
 import Dashboard from './components/dashboard.jsx';
+import MapCiudadano from './components/mapCiudadano.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
-import TestCredentialsHelper from './components/TestCredentialsHelper.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 function AppContent() {
   const { user, isAuthenticated } = useAuth();
@@ -40,6 +40,9 @@ function AppContent() {
                   <>
                     <li class="nav-item">
                       <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="/map">Mapa de Puntos</a>
                     </li>
                     <li class="nav-item">
                       <span style={{ marginLeft: '1em', color: '#666' }}>
@@ -73,10 +76,15 @@ function AppContent() {
               </ProtectedRoute>
             } 
           />
+          <Route 
+            path="/map" 
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>
+                <MapCiudadano />
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
-
-        {/* Helper de credenciales en desarrollo */}
-        <TestCredentialsHelper />
     </>
   )
 }

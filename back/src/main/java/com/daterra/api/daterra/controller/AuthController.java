@@ -21,9 +21,9 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> registrarUsuario(@RequestBody Usuario usuario) {
         try {
-            // Usamos getRunUsuario() porque así se llama en tu clase model
-            if (usuarioRepository.existsById(usuario.getRunUsuario())) {
-                return new ResponseEntity<>("El RUN ya está registrado", HttpStatus.BAD_REQUEST);
+            // Verificamos si el email ya está registrado
+            if (usuarioRepository.existsById(usuario.getEmail())) {
+                return new ResponseEntity<>("El email ya está registrado", HttpStatus.BAD_REQUEST);
             }
 
             Usuario nuevoUsuario = usuarioRepository.save(usuario);
@@ -35,8 +35,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuario loginData) {
-        // Buscamos por runUsuario
-        Optional<Usuario> usuarioOpt = usuarioRepository.findById(loginData.getRunUsuario());
+        // Buscamos por email
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(loginData.getEmail());
 
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
