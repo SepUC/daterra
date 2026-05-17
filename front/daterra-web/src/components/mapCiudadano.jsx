@@ -93,23 +93,23 @@ export default function MapCiudadano() {
     };
 
     return (
-        <div style={{ display: 'flex', width: '100vw', height: '100vh', margin: 0, padding: 0, fontFamily: 'sans-serif', overflow: 'hidden', backgroundColor: '#fff' }}>
+        <div style={{ display: 'flex', width: '100vw', height: '100vh', margin: 0, padding: 0, fontFamily: 'Source Sans Pro, sans-serif', overflow: 'hidden', backgroundColor: '#fff' }}>
 
             {/* BARRA LATERAL IZQUIERDA (NAVEGACIÓN) */}
-            <aside style={{ width: '260px', backgroundColor: '#2e354f', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '1.5em', flexShrink: 0, height: '100vh', boxSizing: 'border-box' }}>
+            <aside style={{ width: '260px', backgroundColor: '#4ee66f', color: '#2e354f', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '1.5em', flexShrink: 0, height: '100vh', boxSizing: 'border-box' }}>
                 <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6em', marginBottom: '2.5em', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1.2em' }}>
-                        <Trash2 size={24} style={{ color: '#829ab1' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6em', marginBottom: '2.5em', borderBottom: '1px solid rgba(46,53,79,0.1)', paddingBottom: '1.2em' }}>
+                        <Trash2 size={24} style={{ color: '#4c785c' }} />
                         <h2 style={{ margin: 0, fontSize: '1.3em', fontWeight: '600' }}>Daterra</h2>
                     </div>
-                    <div style={{ backgroundColor: 'rgba(255,255,255,0.1)', padding: '0.8em 1em', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.7em' }}>
+                    <div style={{ backgroundColor: 'rgba(76,120,92,0.15)', padding: '0.8em 1em', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.7em', color: '#2e354f' }}>
                         <MapPin size={18} />
                         <span>Mapa de Puntos</span>
                     </div>
                 </div>
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.2em' }}>
-                    <div style={{ marginBottom: '1.2em', fontSize: '0.85em' }}>Conectado como:<br /><strong>{activeUser.name}</strong></div>
-                    <button onClick={async () => { if(logout) await logout(); navigate('/login'); }} style={{ width: '100%', padding: '0.7em', backgroundColor: '#e53e3e', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar Sesión</button>
+                <div style={{ borderTop: '1px solid rgba(46,53,79,0.1)', paddingTop: '1.2em' }}>
+                    <div style={{ marginBottom: '1.2em', fontSize: '0.85em', color: '#2e354f' }}>Conectado como:<br /><strong>{activeUser.name}</strong></div>
+                    <button onClick={async () => { if(logout) await logout(); navigate('/login'); }} style={{ width: '100%', padding: '0.7em', backgroundColor: '#FF6B6B', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9em', transition: 'backgroundColor 0.2s' }} onMouseEnter={e => e.currentTarget.style.backgroundColor = '#e85555'} onMouseLeave={e => e.currentTarget.style.backgroundColor = '#FF6B6B'}>Cerrar Sesión</button>
                 </div>
             </aside>
 
@@ -117,7 +117,7 @@ export default function MapCiudadano() {
             <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
 
                 {/* HEADER SUPERIOR */}
-                <header style={{ backgroundColor: '#4c785c', color: '#fff', padding: '1em 2em', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '70px', boxSizing: 'border-box', flexShrink: 0 }}>
+                <header style={{ backgroundColor: '#66c388', color: '#fff', padding: '1em 2em', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '70px', boxSizing: 'border-box', flexShrink: 0 }}>
                     <div>
                         <h1 style={{ margin: 0, fontSize: '1.4em', fontWeight: '500' }}>♻️ Puntos de Reciclaje</h1>
                         <span style={{ fontSize: '0.8em', opacity: 0.85 }}>Base de datos AWS Conectada • Renderizado por Hardware Activo</span>

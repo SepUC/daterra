@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,7 +12,18 @@ function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user, isAuthenticated } = useAuth();
+
+  // Redirigir si ya está autenticado
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      if (user.idTipoUsu === 2) {
+        navigate('/mapCiudadano');
+      } else {
+        navigate('/dashboard');
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,9 +40,15 @@ function Login() {
     try {
       // Llamamos a la función login del AuthContext
       // Pasamos el email y el password
-      await login(email, password);
-      console.log('Login exitoso');
-      navigate('/dashboard');
+      const userData = await login(email, password);
+      console.log('Login exitoso', userData);
+
+      // Condición para redirigir según el tipo de usuario
+      if (userData && userData.idTipoUsu === 2) {
+        navigate('/mapCiudadano');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       // 3. Manejo de errores específicos (RUN no encontrado, contraseña mal, etc)
       setError(err.message || 'Credenciales inválidas. Intenta de nuevo.');

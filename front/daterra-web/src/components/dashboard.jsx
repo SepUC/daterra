@@ -65,20 +65,20 @@ function Dashboard() {
   const canViewReports = checkPermission('view_reports');
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8f9fa', fontFamily: 'Source Sans Pro, sans-serif' }}>
       {/* Sidebar */}
       <aside
         style={{
           width: sidebarOpen ? '280px' : '80px',
-          backgroundColor: 'rgba(50, 60, 90, 0.95)',
-          color: '#fff',
+          backgroundColor: '#4ee66f',
+          color: '#2e354f',
           padding: '2em 1em',
           transition: 'width 0.3s ease',
           position: 'fixed',
           height: '100vh',
           overflowY: 'auto',
           zIndex: 1000,
-          boxShadow: '2px 0 10px rgba(0,0,0,0.2)',
+          boxShadow: '2px 0 10px rgba(0,0,0,0.1)',
         }}
       >
         <div
@@ -88,7 +88,7 @@ function Dashboard() {
             justifyContent: 'space-between',
             marginBottom: '2em',
             paddingBottom: '1.5em',
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
+            borderBottom: '1px solid rgba(46,53,79,0.1)',
           }}
         >
           {sidebarOpen && (
@@ -102,7 +102,7 @@ function Dashboard() {
             style={{
               background: 'none',
               border: 'none',
-              color: '#fff',
+              color: '#2e354f',
               cursor: 'pointer',
               fontSize: '1.5em',
               padding: '0',
@@ -121,7 +121,7 @@ function Dashboard() {
             style={{
               padding: '1em',
               borderRadius: '8px',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backgroundColor: 'rgba(46, 53, 79, 0.1)',
               marginBottom: '1em',
               cursor: 'pointer',
               display: 'flex',
@@ -129,8 +129,8 @@ function Dashboard() {
               gap: '0.75em',
               transition: 'backgroundColor 0.2s',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)')}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(76, 120, 92, 0.2)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(46, 53, 79, 0.1)')}
           >
             <BarChart3 size={20} />
             {sidebarOpen && <span>Dashboard</span>}
@@ -144,15 +144,15 @@ function Dashboard() {
             bottom: '2em',
             left: '1em',
             right: '1em',
-            borderTop: '1px solid rgba(255,255,255,0.1)',
+            borderTop: '1px solid rgba(46,53,79,0.1)',
             paddingTop: '1.5em',
           }}
         >
           {sidebarOpen && (
             <div style={{ marginBottom: '1.5em' }}>
-              <p style={{ margin: '0 0 0.5em 0', fontSize: '0.9em', opacity: 0.8 }}>Conectado como</p>
-              <p style={{ margin: 0, fontWeight: 'bold', wordBreak: 'break-word' }}>{user.name}</p>
-              <p style={{ margin: '0.3em 0 0 0', fontSize: '0.8em', opacity: 0.7 }}>
+              <p style={{ margin: '0 0 0.5em 0', fontSize: '0.9em', color: '#2e354f', opacity: 0.8 }}>Conectado como</p>
+              <p style={{ margin: 0, fontWeight: 'bold', wordBreak: 'break-word', color: '#2e354f' }}>{user.name}</p>
+              <p style={{ margin: '0.3em 0 0 0', fontSize: '0.8em', color: '#2e354f', opacity: 0.7 }}>
                 <Shield size={12} style={{ display: 'inline', marginRight: '0.3em' }} />
                 {userRole?.label}
               </p>
