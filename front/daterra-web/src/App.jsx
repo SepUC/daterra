@@ -4,15 +4,16 @@ import heroImg from './assets/hero.png'
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { BrowserRouter as Router, Routes, Route, useNavigate, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
+// Importación única de componentes (sin duplicados)
 import Start from './components/start.jsx';
 import Login from './components/login.jsx';
 import Register from './components/register.jsx';
 import Dashboard from './components/dashboard.jsx';
-import MapCiudadano from './components/mapCiudadano.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import MapCiudadano from './components/mapCiudadano.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 
 function AppContent() {
@@ -38,7 +39,7 @@ function AppContent() {
                       </li>
                   )}
 
-                  {/* BOTÓN DEL MAPA LIBERADO: Visible siempre para desarrollo rápido */}
+                  {/* BOTÓN DEL MAPA: Enrutado correctamente */}
                   <li className="nav-item">
                     <Link className="nav-link" to="/map">Mapa de Puntos</Link>
                   </li>
@@ -49,14 +50,14 @@ function AppContent() {
                           <Link className="nav-link" to="/dashboard">Dashboard</Link>
                         </li>
                         <li className="nav-item">
-                      <span style={{ marginLeft: '1em', color: '#666' }}>
-                        👤 {user?.name}
-                      </span>
+                          <span style={{ marginLeft: '1em', color: '#666' }}>
+                            👤 {user?.name}
+                          </span>
                         </li>
                       </>
                   )}
                   <li className="nav-item">
-                    <a className="nav-link" href="https://i.pinimg.com/736x/49/62/ee/4962ee8228258c179a707f7371a08d2b.jpg" target="_blank" rel="noopener noreferrer">El profe es terrible bacan</a>
+                    <a className="nav-link" href="https://i.pinimg.com/736x/49/62/ee/4962ee8228258c179a707f7371a08d2b.jpg" target="_blank" rel="noreferrer">El profe es terrible bacan</a>
                   </li>
                   <li className="nav-item">
                     <a className="nav-link disabled" aria-disabled="true">Test boton deshabilitado</a>
@@ -67,12 +68,12 @@ function AppContent() {
           </nav>
         </div>
 
-        {/* Routes */}
+        {/* Enrutamiento de la aplicación */}
         <Routes>
           <Route path="/" element={<Start />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-
+          <Route path="/map" element={<MapCiudadano />} />
           <Route
               path="/dashboard"
               element={
@@ -81,9 +82,6 @@ function AppContent() {
                 </ProtectedRoute>
               }
           />
-
-          {/* RUTA DEL MAPA LIBERADA: Ya no requiere Auth temporalmente */}
-          <Route path="/map" element={<MapCiudadano />} />
         </Routes>
       </>
   )
@@ -97,7 +95,7 @@ function App() {
           <footer className="bg-light text-center text-lg-start">
             <div className="text-center p-3" style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
               © 2026 Copyright:
-              <a className="text-dark" href="https://m.media-amazon.com/images/I/61XmTyKs7sL.jpg" target="_blank" rel="noopener noreferrer">Daterra.com</a>
+              <a className="text-dark" href="https://m.media-amazon.com/images/I/61XmTyKs7sL.jpg" target="_blank" rel="noreferrer"> Daterra.com</a>
             </div>
           </footer>
         </Router>
