@@ -53,7 +53,7 @@ function AppContent() {
           <Route 
             path="/dashboard" 
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProtectedRoute isAuthenticated={isAuthenticated} user={user} requiredUserType={1}>
                 <Dashboard />
               </ProtectedRoute>
             } 
@@ -61,7 +61,7 @@ function AppContent() {
           <Route 
             path="/mapCiudadano"
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProtectedRoute isAuthenticated={isAuthenticated} user={user} requiredUserType={2}>
                 <MapCiudadano />
               </ProtectedRoute>
             }

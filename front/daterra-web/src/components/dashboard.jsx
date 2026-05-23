@@ -20,6 +20,8 @@ import {
 import { Menu, LogOut, BarChart3, PieChart as PieChartIcon, Trash2, Shield, AlertCircle } from 'lucide-react';
 import '../assets/css/main.css';
 import '../assets/css/fontawesome-all.min.css';
+import '../styles/shared.css';
+import '../styles/dashboard.css';
 
 // Datos de ejemplo para gráficos
 const monthlyWasteData = [
@@ -65,70 +67,25 @@ function Dashboard() {
   const canViewReports = checkPermission('view_reports');
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8f9fa', fontFamily: 'Source Sans Pro, sans-serif' }}>
+    <div className="dashboard-container">
       {/* Sidebar */}
-      <aside
-        style={{
-          width: sidebarOpen ? '280px' : '80px',
-          backgroundColor: '#4ee66f',
-          color: '#2e354f',
-          padding: '2em 1em',
-          transition: 'width 0.3s ease',
-          position: 'fixed',
-          height: '100vh',
-          overflowY: 'auto',
-          zIndex: 1000,
-          boxShadow: '2px 0 10px rgba(0,0,0,0.1)',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '2em',
-            paddingBottom: '1.5em',
-            borderBottom: '1px solid rgba(46,53,79,0.1)',
-          }}
-        >
+      <aside className="dashboard-sidebar" style={{ width: sidebarOpen ? '280px' : '80px' }}>
+        <div className="sidebar-title-section">
           {sidebarOpen && (
-            <h2 style={{ margin: 0, fontSize: '1.5em', fontWeight: 'bold' }}>
+            <h2>
               <Trash2 size={24} style={{ display: 'inline', marginRight: '0.5em' }} />
               Daterra
             </h2>
           )}
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#2e354f',
-              cursor: 'pointer',
-              fontSize: '1.5em',
-              padding: '0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
+          <button className="sidebar-toggle-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
             <Menu size={24} />
           </button>
         </div>
 
         {/* Navegación */}
-        <nav style={{ marginBottom: '3em' }}>
+        <nav className="dashboard-nav">
           <div
-            style={{
-              padding: '1em',
-              borderRadius: '8px',
-              backgroundColor: 'rgba(46, 53, 79, 0.1)',
-              marginBottom: '1em',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75em',
-              transition: 'backgroundColor 0.2s',
-            }}
+            className="nav-item"
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(76, 120, 92, 0.2)')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(46, 53, 79, 0.1)')}
           >
@@ -138,46 +95,18 @@ function Dashboard() {
         </nav>
 
         {/* Usuario */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '2em',
-            left: '1em',
-            right: '1em',
-            borderTop: '1px solid rgba(46,53,79,0.1)',
-            paddingTop: '1.5em',
-          }}
-        >
+        <div className="sidebar-user-section">
           {sidebarOpen && (
-            <div style={{ marginBottom: '1.5em' }}>
-              <p style={{ margin: '0 0 0.5em 0', fontSize: '0.9em', color: '#2e354f', opacity: 0.8 }}>Conectado como</p>
-              <p style={{ margin: 0, fontWeight: 'bold', wordBreak: 'break-word', color: '#2e354f' }}>{user.name}</p>
-              <p style={{ margin: '0.3em 0 0 0', fontSize: '0.8em', color: '#2e354f', opacity: 0.7 }}>
-                <Shield size={12} style={{ display: 'inline', marginRight: '0.3em' }} />
+            <div className="user-info-block">
+              <p className="user-info-label">Conectado como</p>
+              <p className="user-info-name">{user.name}</p>
+              <p className="user-role">
+                <Shield size={12} />
                 {userRole?.label}
               </p>
             </div>
           )}
-          <button
-            onClick={handleLogout}
-            style={{
-              width: '100%',
-              padding: '0.75em',
-              backgroundColor: '#FF6B6B',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5em',
-              transition: 'backgroundColor 0.2s',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e85555')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FF6B6B')}
-          >
+          <button className="btn-logout" onClick={handleLogout}>
             <LogOut size={18} />
             {sidebarOpen && <span>Cerrar Sesión</span>}
           </button>
@@ -185,45 +114,24 @@ function Dashboard() {
       </aside>
 
       {/* Contenido Principal */}
-      <main
-        style={{
-          marginLeft: sidebarOpen ? '280px' : '80px',
-          flex: 1,
-          padding: '2em',
-          transition: 'margin-left 0.3s ease',
-        }}
-      >
+      <main className={`dashboard-main ${!sidebarOpen ? 'sidebar-collapsed' : ''}`}>
         {/* Información de Seguridad y Rol del Usuario */}
         {user && (
-          <section style={{ marginBottom: '2em' }}>
-            <div style={{ 
-              backgroundColor: '#e8f5e9', 
-              padding: '1.5em', 
-              borderRadius: '12px', 
-              borderLeft: `5px solid ${userRole?.color || '#999'}`,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-            }}>
-              <div style={{ display: 'flex', gap: '1em', alignItems: 'start' }}>
-                <Shield size={24} style={{ color: userRole?.color, marginTop: '0.2em' }} />
-                <div style={{ flex: 1 }}>
-                  <h3 style={{ margin: '0 0 0.5em 0', color: '#333' }}>
-                    👤 {user.name}
-                  </h3>
-                  <p style={{ margin: '0 0 0.3em 0', color: '#666', fontSize: '0.95em' }}>
-                    <strong>Rol:</strong> {userRole?.label}
-                  </p>
-                  <p style={{ margin: '0 0 0.3em 0', color: '#666', fontSize: '0.95em' }}>
-                    <strong>Correo:</strong> {user.email}
-                  </p>
-                  {user.municipality && (
-                    <p style={{ margin: '0 0 0.3em 0', color: '#666', fontSize: '0.95em' }}>
-                      <strong>Municipalidad:</strong> {user.municipality}
-                    </p>
-                  )}
-                  <p style={{ margin: '0.5em 0 0 0', color: '#666', fontSize: '0.9em' }}>
-                    <strong>Permisos:</strong> {user.permissions?.length || 0} permisos asignados
-                  </p>
-                </div>
+          <section className="dashboard-security-section">
+            <div className="security-card" style={{ borderLeftColor: userRole?.color || '#999' }}>
+              <div className="security-card-icon">
+                <Shield size={24} style={{ color: userRole?.color }} />
+              </div>
+              <div className="security-card-content">
+                <h3>👤 {user.name}</h3>
+                <p><strong>Rol:</strong> {userRole?.label}</p>
+                <p><strong>Correo:</strong> {user.email}</p>
+                {user.municipality && (
+                  <p><strong>Municipalidad:</strong> {user.municipality}</p>
+                )}
+                <p className="security-card-permissions">
+                  <strong>Permisos:</strong> {user.permissions?.length || 0} permisos asignados
+                </p>
               </div>
             </div>
           </section>
@@ -231,35 +139,26 @@ function Dashboard() {
 
         {/* Header */}
         <section style={{ marginBottom: '3em' }}>
-          <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', padding: '2em', borderRadius: '15px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-            <h1 style={{ margin: 0, color: '#323C5A', fontSize: '2.5em', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+          <div className="card-header">
+            <h1>
               <BarChart3 size={32} style={{ color: '#4ECDC4' }} />
               Panel de Control - Gestión de Desechos
             </h1>
-            <p style={{ margin: '0.5em 0 0 0', color: '#666' }}>Análisis de reciclaje y gestión ambiental</p>
+            <p>Análisis de reciclaje y gestión ambiental</p>
           </div>
         </section>
 
         {/* KPIs */}
-        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5em', marginBottom: '2em' }}>
+        <section className="kpi-section">
           {[
             { label: 'Total Reciclado (6 meses)', value: '3,500 kg', color: '#4ECDC4' },
             { label: 'Promedio Mensual', value: '583 kg', color: '#45B7D1' },
             { label: 'Mes Actual', value: '680 kg', color: '#FF6B6B' },
             { label: 'Objetivo Anual', value: '8,000 kg', color: '#FFA07A' },
           ].map((kpi, idx) => (
-            <div
-              key={idx}
-              style={{
-                backgroundColor: '#fff',
-                padding: '1.5em',
-                borderRadius: '12px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                borderLeft: `5px solid ${kpi.color}`,
-              }}
-            >
-              <p style={{ margin: 0, color: '#888', fontSize: '0.9em', fontWeight: 'bold' }}>{kpi.label}</p>
-              <h3 style={{ margin: '0.5em 0 0 0', color: kpi.color, fontSize: '1.8em', fontWeight: 'bold' }}>
+            <div key={idx} className="kpi-card" style={{ borderLeftColor: kpi.color }}>
+              <p className="kpi-label">{kpi.label}</p>
+              <h3 className="kpi-value" style={{ color: kpi.color }}>
                 {kpi.value}
               </h3>
             </div>
@@ -267,24 +166,13 @@ function Dashboard() {
         </section>
 
         {/* Gráficos */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '2em', marginBottom: '2em' }}>
+        <div className="charts-section">
           {!canViewReports && (
-            <div style={{
-              gridColumn: '1 / -1',
-              backgroundColor: '#fff3cd',
-              padding: '1.5em',
-              borderRadius: '12px',
-              border: '1px solid #ffc107',
-              display: 'flex',
-              gap: '1em',
-              alignItems: 'start'
-            }}>
-              <AlertCircle size={24} style={{ color: '#ff9800', marginTop: '0.2em' }} />
-              <div>
-                <p style={{ margin: '0 0 0.5em 0', fontWeight: 'bold', color: '#333' }}>
-                  🔒 Acceso Limitado
-                </p>
-                <p style={{ margin: '0', color: '#666' }}>
+            <div className="access-warning">
+              <AlertCircle size={24} className="access-warning-icon" />
+              <div className="access-warning-content">
+                <p>🔒 Acceso Limitado</p>
+                <p>
                   Tu rol ({userRole?.label}) no tiene permiso para ver todos los reportes. 
                   Contacta a un administrador si necesitas más acceso.
                 </p>
@@ -293,15 +181,8 @@ function Dashboard() {
           )}
 
           {/* Gráfico de Desechos Reciclados por Mes */}
-          <div
-            style={{
-              backgroundColor: '#fff',
-              padding: '2em',
-              borderRadius: '12px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <h2 style={{ margin: '0 0 1.5em 0', color: '#323C5A', fontSize: '1.3em', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+          <div className="chart-card">
+            <h2>
               <BarChart3 size={24} style={{ color: '#4ECDC4' }} />
               Desechos Reciclados por Mes
             </h2>
@@ -326,15 +207,8 @@ function Dashboard() {
           </div>
 
           {/* Gráfico de Desechos Más Reciclados */}
-          <div
-            style={{
-              backgroundColor: '#fff',
-              padding: '2em',
-              borderRadius: '12px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <h2 style={{ margin: '0 0 1.5em 0', color: '#323C5A', fontSize: '1.3em', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5em' }}>
+          <div className="chart-card">
+            <h2>
               <PieChartIcon size={24} style={{ color: '#45B7D1' }} />
               Distribución de Desechos Más Reciclados
             </h2>
@@ -371,52 +245,26 @@ function Dashboard() {
         </div>
 
         {/* Tabla de Detalles */}
-        <section
-          style={{
-            backgroundColor: '#fff',
-            padding: '2em',
-            borderRadius: '12px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          }}
-        >
-          <h2 style={{ margin: '0 0 1.5em 0', color: '#323C5A', fontSize: '1.3em', fontWeight: 'bold' }}>
-            Desglose Detallado de Desechos
-          </h2>
-          <div style={{ overflowX: 'auto' }}>
-            <table
-              style={{
-                width: '100%',
-                borderCollapse: 'collapse',
-                fontSize: '0.95em',
-              }}
-            >
+        <section className="table-section">
+          <h2>Desglose Detallado de Desechos</h2>
+          <div className="table-wrapper">
+            <table className="dashboard-table">
               <thead>
-                <tr style={{ borderBottom: '2px solid #4ECDC4' }}>
-                  <th style={{ padding: '1em', textAlign: 'left', color: '#323C5A', fontWeight: 'bold' }}>Tipo de Desecho</th>
-                  <th style={{ padding: '1em', textAlign: 'left', color: '#323C5A', fontWeight: 'bold' }}>Porcentaje</th>
-                  <th style={{ padding: '1em', textAlign: 'left', color: '#323C5A', fontWeight: 'bold' }}>Kilogramos</th>
-                  <th style={{ padding: '1em', textAlign: 'left', color: '#323C5A', fontWeight: 'bold' }}>Estado</th>
+                <tr>
+                  <th>Tipo de Desecho</th>
+                  <th>Porcentaje</th>
+                  <th>Kilogramos</th>
+                  <th>Estado</th>
                 </tr>
               </thead>
               <tbody>
                 {topWasteData.map((item, idx) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid #e0e0e0' }}>
-                    <td style={{ padding: '1em', color: '#555' }}>{item.name}</td>
-                    <td style={{ padding: '1em', color: '#555' }}>{item.value}%</td>
-                    <td style={{ padding: '1em', color: '#555' }}>{item.kg.toLocaleString()}</td>
-                    <td style={{ padding: '1em' }}>
-                      <span
-                        style={{
-                          backgroundColor: '#d4edda',
-                          color: '#155724',
-                          padding: '0.4em 0.8em',
-                          borderRadius: '6px',
-                          fontSize: '0.85em',
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        ✓ Procesado
-                      </span>
+                  <tr key={idx}>
+                    <td>{item.name}</td>
+                    <td>{item.value}%</td>
+                    <td>{item.kg.toLocaleString()}</td>
+                    <td>
+                      <span className="table-status-badge">✓ Procesado</span>
                     </td>
                   </tr>
                 ))}
