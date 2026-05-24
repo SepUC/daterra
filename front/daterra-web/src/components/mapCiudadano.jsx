@@ -6,6 +6,8 @@ import { MapPin, Trash2, RefreshCw } from 'lucide-react';
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import '../styles/shared.css';
+import '../styles/mapCiudadano.css';
 
 // Componente para redibujar automáticamente el mapa cuando cambie el centro o tamaño de pantalla
 function ControlMapa({ centro }) {
@@ -93,72 +95,61 @@ export default function MapCiudadano() {
     };
 
     return (
-        <div style={{ display: 'flex', width: '100vw', height: '100vh', margin: 0, padding: 0, fontFamily: 'sans-serif', overflow: 'hidden', backgroundColor: '#fff' }}>
+        <div className="map-container">
 
             {/* BARRA LATERAL IZQUIERDA (NAVEGACIÓN) */}
-            <aside style={{ width: '260px', backgroundColor: '#2e354f', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '1.5em', flexShrink: 0, height: '100vh', boxSizing: 'border-box' }}>
+            <aside className="map-sidebar">
                 <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6em', marginBottom: '2.5em', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1.2em' }}>
-                        <Trash2 size={24} style={{ color: '#829ab1' }} />
-                        <h2 style={{ margin: 0, fontSize: '1.3em', fontWeight: '600' }}>Daterra</h2>
+                    <div className="sidebar-header">
+                        <Trash2 size={24} style={{ color: '#4c785c' }} />
+                        <h2>Daterra</h2>
                     </div>
-                    <div style={{ backgroundColor: 'rgba(255,255,255,0.1)', padding: '0.8em 1em', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '0.7em' }}>
+                    <div className="sidebar-nav-item">
                         <MapPin size={18} />
                         <span>Mapa de Puntos</span>
                     </div>
                 </div>
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.2em' }}>
-                    <div style={{ marginBottom: '1.2em', fontSize: '0.85em' }}>Conectado como:<br /><strong>{activeUser.name}</strong></div>
-                    <button onClick={async () => { if(logout) await logout(); navigate('/login'); }} style={{ width: '100%', padding: '0.7em', backgroundColor: '#e53e3e', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar Sesión</button>
+                <div className="sidebar-footer">
+                    <div className="sidebar-user-info">Conectado como:<br /><strong>{activeUser.name}</strong></div>
+                    <button className="btn-logout" onClick={async () => { if(logout) await logout(); navigate('/login'); }}>Cerrar Sesión</button>
                 </div>
             </aside>
 
             {/* SECCIÓN PRINCIPAL DE CONTENIDO */}
-            <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+            <main className="map-main-content">
 
                 {/* HEADER SUPERIOR */}
-                <header style={{ backgroundColor: '#4c785c', color: '#fff', padding: '1em 2em', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '70px', boxSizing: 'border-box', flexShrink: 0 }}>
+                <header className="map-header" style={{ backgroundColor: '#66c388' }}>
                     <div>
-                        <h1 style={{ margin: 0, fontSize: '1.4em', fontWeight: '500' }}>♻️ Puntos de Reciclaje</h1>
-                        <span style={{ fontSize: '0.8em', opacity: 0.85 }}>Base de datos AWS Conectada • Renderizado por Hardware Activo</span>
+                        <h1>♻️ Puntos de Reciclaje</h1>
+                        <span className="map-header-subtitle">Base de datos AWS Conectada • Renderizado por Hardware Activo</span>
                     </div>
                     <button
                         onClick={() => refetch()}
                         disabled={isFetching}
-                        style={{ backgroundColor: 'rgba(255,255,255,0.2)', color: '#fff', border: 'none', padding: '0.5em 1em', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5em', fontSize: '0.85em' }}
+                        className="sync-button"
                     >
-                        <RefreshCw size={14} className={isFetching ? "animate-spin" : ""} />
+                        <RefreshCw size={14} className={isFetching ? "sync-icon spinning" : "sync-icon"} />
                         {isFetching ? "Sincronizando..." : "Sincronizar AWS"}
                     </button>
                 </header>
 
-                {/* WORKSPACE DIVIDIDO A PANTALLA COMPLETA (Ampliamos la columna izquierda a 360px) */}
-                <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '360px 1fr', height: 'calc(100vh - 70px)', overflow: 'hidden', width: '100%' }}>
+                {/* WORKSPACE DIVIDIDO A PANTALLA COMPLETA */}
+                <div className="map-workspace">
 
                     {/* PANEL IZQUIERDO DE BÚSQUEDAS Y TARJETAS */}
-                    <div style={{ borderRight: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', height: '100%', maxHeight: 'calc(100vh - 70px)', backgroundColor: '#fff', overflow: 'hidden' }}>
-                        <div style={{ padding: '1.2em', borderBottom: '1px solid #edf2f7', flexShrink: 0 }}>
-                            <span style={{ fontSize: '0.8em', color: '#718096', textTransform: 'uppercase', fontWeight: '700' }}>Puntos en el Radio</span>
-                            <div style={{ fontSize: '1.3em', fontWeight: '700', color: '#2d3748', margin: '0.2em 0' }}>{filteredPoints.length} encontrados</div>
+                    <div className="points-panel">
+                        <div className="points-panel-header">
+                            <span className="points-count-label">Puntos en el Radio</span>
+                            <div className="points-count-value">{filteredPoints.length} encontrados</div>
 
-                            {/* Contenedor de Filtros optimizado con CSS Grid de 3 columnas */}
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginTop: '0.8em' }}>
+                            {/* Contenedor de Filtros */}
+                            <div className="map-filter-buttons">
                                 {['todos', 'limpio', 'verde'].map(f => (
                                     <button
                                         key={f}
                                         onClick={() => setFiltroActivo(f)}
-                                        style={{
-                                            padding: '8px 0', // Eliminamos padding lateral para que se ajuste perfecto al grid
-                                            borderRadius: '20px',
-                                            border: '1px solid #e2e8f0',
-                                            fontSize: '0.78em',
-                                            cursor: 'pointer',
-                                            fontWeight: '600',
-                                            textAlign: 'center',
-                                            backgroundColor: filtroActivo === f ? '#4c785c' : '#f7fafc',
-                                            color: filtroActivo === f ? '#fff' : '#4a5568',
-                                            transition: 'all 0.15s ease'
-                                        }}
+                                        className={`map-filter-btn ${filtroActivo === f ? 'active' : ''}`}
                                     >
                                         {f === 'todos' ? 'Todos' : f === 'limpio' ? 'Limpio' : 'Verde'}
                                     </button>
@@ -167,9 +158,9 @@ export default function MapCiudadano() {
                         </div>
 
                         {/* CONTENEDOR CON BARRA DE DESPLAZAMIENTO FORZADA */}
-                        <div style={{ flex: 1, overflowY: 'auto', maxHeight: '100%', backgroundColor: '#fff', paddingRight: '2px' }}>
+                        <div className="points-list">
                             {filteredPoints.length === 0 ? (
-                                <div style={{ padding: '2em', textAlign: 'center', color: '#a0aec0', fontSize: '0.9em' }}>No se encontraron puntos en este rango.</div>
+                                <div className="points-list-empty">No se encontraron puntos en este rango.</div>
                             ) : (
                                 filteredPoints.map((punto, i) => {
                                     const tipoTexto = (punto.type || punto.tipoResiduo || '').toLowerCase();
@@ -179,16 +170,14 @@ export default function MapCiudadano() {
                                     return (
                                         <div
                                             key={i}
+                                            className="point-item"
                                             onClick={() => setCentroMapa({ lat: parseFloat(punto.lat || punto.latitud), lng: parseFloat(punto.lng || punto.longitud) })}
-                                            style={{ padding: '1.1em 1.4em', borderBottom: '1px solid #f7fafc', cursor: 'pointer', transition: 'background 0.2s' }}
-                                            onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f7fafc'}
-                                            onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
                                         >
-                                            <div style={{ fontWeight: '600', color: '#2d3748', fontSize: '0.9em', marginBottom: '0.2em' }}>{punto.owner || punto.nombre || "Punto de Reciclaje"}</div>
-                                            <div style={{ fontSize: '0.78em', color: '#718096', marginBottom: '0.5em' }}>📍 {direccionCompleta}</div>
-                                            <span style={{ fontSize: '0.65em', padding: '3px 8px', borderRadius: '4px', fontWeight: 'bold', backgroundColor: esLimpio ? '#e6fffa' : '#ebf8ff', color: esLimpio ? '#047481' : '#2b6cb0' }}>
-                        {esLimpio ? 'PUNTO LIMPIO' : 'PUNTO VERDE'}
-                      </span>
+                                            <div className="point-item-name">{punto.owner || punto.nombre || "Punto de Reciclaje"}</div>
+                                            <div className="point-item-address">📍 {direccionCompleta}</div>
+                                            <span className={`point-item-type ${esLimpio ? 'clean' : 'green'}`}>
+                                                {esLimpio ? 'PUNTO LIMPIO' : 'PUNTO VERDE'}
+                                            </span>
                                         </div>
                                     );
                                 })
@@ -197,11 +186,11 @@ export default function MapCiudadano() {
                     </div>
 
                     {/* VISOR DEL MAPA OPTIMIZADO POR CANVAS */}
-                    <div style={{ width: '100%', height: '100%', position: 'relative', backgroundColor: '#e5e9f0' }}>
+                    <div className="map-viewer">
                         <MapContainer
                             center={[centroMapa.lat, centroMapa.lng]}
                             zoom={12}
-                            style={{ width: '100%', height: '100%', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
+                            className="map-canvas"
                             zoomControl={true}
                             preferCanvas={true}
                         >
@@ -242,13 +231,13 @@ export default function MapCiudadano() {
                                         }}
                                     >
                                         <Popup>
-                                            <div style={{ minWidth: '150px' }}>
+                                            <div className="popup-content" style={{ minWidth: '150px' }}>
                                                 <strong style={{ color: colorMarcador, fontSize: '0.95em' }}>
                                                     {punto.owner || punto.nombre}
                                                 </strong><br/>
-                                                <span style={{ fontSize: '0.85em', color: '#555', marginTop: '3px', display: 'inline-block' }}>
-                          {direccionCompletaPopup}
-                        </span>
+                                                <span>
+                                                    {direccionCompletaPopup}
+                                                </span>
                                             </div>
                                         </Popup>
                                     </CircleMarker>
