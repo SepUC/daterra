@@ -9,7 +9,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/puntos")
-@CrossOrigin(origins = "http://localhost:5173") // ¡Crucial! Permite que tu Frontend se conecte sin problemas de CORS
+//@CrossOrigin(origins = "http://localhost:5173") // ¡Crucial! Permite que tu Frontend se conecte sin problemas de CORS
+//@CrossOrigin(originPatterns = "*")
 public class PuntoLimpioController {
 
     @Autowired

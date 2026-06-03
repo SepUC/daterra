@@ -13,7 +13,8 @@ import com.daterra.api.daterra.repository.UsuarioRepository;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+//@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+//@CrossOrigin(originPatterns = "*")
 public class UsuarioController {
 
     @Autowired
