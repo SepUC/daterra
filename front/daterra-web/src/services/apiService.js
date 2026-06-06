@@ -3,7 +3,9 @@
  * Soporta autenticación, gestión de usuarios y datos de desechos
  */
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_URL = import.meta.env.DEV
+  ? '/api'
+  : (import.meta.env.VITE_API_URL || 'http://localhost:8080/api');
 const TIMEOUT = import.meta.env.VITE_REQUEST_TIMEOUT || 10000;
 
 class APIService {
@@ -109,6 +111,26 @@ class APIService {
   // Obtener desechos más reciclados
   async getTopWasteTypes() {
     return this.request('/waste/top-types', { method: 'GET' });
+  }
+
+  // Obtener resumen agregado de residuos por región
+  async getWasteByRegions() {
+    return this.request('/sinader/regiones', { method: 'GET' });
+  }
+
+  // Obtener resumen agregado de residuos por tratamiento
+  async getWasteByTreatments() {
+    return this.request('/sinader/tratamientos', { method: 'GET' });
+  }
+
+  // Obtener el paquete de datos necesario para el dashboard de residuos
+  async getWasteDashboardData() {
+    const [regions, treatments] = await Promise.all([
+      this.getWasteByRegions(),
+      this.getWasteByTreatments(),
+    ]);
+
+    return { regions, treatments };
   }
 
   // Obtener todos los registros de desechos

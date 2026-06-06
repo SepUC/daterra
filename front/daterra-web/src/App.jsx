@@ -23,7 +23,7 @@ function AppContent() {
           <nav style={{ backgroundColor: '#ffffff', padding: '1em 0', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontFamily: 'Source Sans Pro, sans-serif', borderBottom: '3px solid #4c785c' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: '2em', paddingRight: '2em', maxWidth: '1400px', margin: '0 auto' }}>
               <Link to="/" style={{ color: '#2e354f', textDecoration: 'none', fontSize: '1.5em', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-                <span style={{ fontSize: '1.2em' }}>♻️</span> Daterra
+                <img src="full_logo.png" alt="Daterra" style={{ height: '1.8em', width: 'auto' }} />
               </Link>
               <div style={{ display: 'flex', alignItems: 'center', gap: '2.5em' }}>
                 <Link to="/" style={{ color: '#2e354f', textDecoration: 'none', fontSize: '0.95em', transition: 'all 0.2s', padding: '0.5em 0', fontWeight: '500' }} onMouseEnter={e => { e.target.style.color = '#4c785c'; e.target.style.fontWeight = 'bold'; }} onMouseLeave={e => { e.target.style.color = '#2e354f'; e.target.style.fontWeight = '500'; }}>Inicio</Link>

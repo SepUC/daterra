@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
-import { ROLE_PERMISSIONS, hasPermission } from '../constants/testUsers';
+import { ROLE_PERMISSIONS } from '../constants/testUsers';
+import apiService from '../services/apiService';
+import {
+  buildWasteDashboardData,
+  formatToneladas,
+  normalizeDashboardError,
+} from '../utils/wasteAnalytics';
 import {
   BarChart,
   Bar,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
@@ -23,30 +28,26 @@ import '../assets/css/fontawesome-all.min.css';
 import '../styles/shared.css';
 import '../styles/dashboard.css';
 
-// Datos de ejemplo para gráficos
-const monthlyWasteData = [
-  { month: 'Enero', reciclado: 450, organico: 300, plastico: 200 },
-  { month: 'Febrero', reciclado: 520, organico: 280, plastico: 220 },
-  { month: 'Marzo', reciclado: 480, organico: 310, plastico: 190 },
-  { month: 'Abril', reciclado: 650, organico: 350, plastico: 250 },
-  { month: 'Mayo', reciclado: 720, organico: 400, plastico: 280 },
-  { month: 'Junio', reciclado: 680, organico: 380, plastico: 260 },
-];
-
-const topWasteData = [
-  { name: 'Plástico', value: 35, kg: 1200 },
-  { name: 'Papel', value: 25, kg: 850 },
-  { name: 'Metal', value: 20, kg: 680 },
-  { name: 'Vidrio', value: 15, kg: 510 },
-  { name: 'Otros', value: 5, kg: 170 },
-];
-
 const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
 
 function Dashboard() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { user, logout, checkPermission } = useAuth();
+
+  const {
+    data: wasteData,
+    isLoading,
+    isFetching,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['waste-dashboard'],
+    queryFn: () => apiService.getWasteDashboardData(),
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const handleLogout = async () => {
     try {
@@ -63,8 +64,28 @@ function Dashboard() {
   }
 
   const userRole = ROLE_PERMISSIONS[user.role];
-  const canRecordWaste = checkPermission('record_waste');
   const canViewReports = checkPermission('view_reports');
+  const dashboardData = buildWasteDashboardData(
+    wasteData?.regions ?? [],
+    wasteData?.treatments ?? [],
+  );
+
+  const errorMessage = isError ? normalizeDashboardError(error) : null;
+  const totalToneladas = formatToneladas(dashboardData.metrics.totalToneladas);
+  const promedioPorRegion = formatToneladas(dashboardData.metrics.averagePerRegion);
+  const topRegion = dashboardData.metrics.topRegion?.label || 'Sin datos';
+  const topTreatment = dashboardData.metrics.topTreatment?.label || 'Sin datos';
+
+  const truncateLabel = (label, maxLength = 15) => {
+  return label.length > maxLength ? label.substring(0, maxLength) + '...' : label;
+  };
+
+  const kpis = [
+    { label: 'Toneladas totales', value: `${totalToneladas} t`, color: '#4ECDC4' },
+    { label: 'Regiones con dato', value: `${dashboardData.metrics.regionCount}`, color: '#45B7D1' },
+    { label: 'Tratamientos registrados', value: `${dashboardData.metrics.treatmentCount}`, color: '#FF6B6B' },
+    { label: 'Promedio por región', value: `${promedioPorRegion} t`, color: '#FFA07A' },
+  ];
 
   return (
     <div className="dashboard-container">
@@ -142,20 +163,15 @@ function Dashboard() {
           <div className="card-header">
             <h1>
               <BarChart3 size={32} style={{ color: '#4ECDC4' }} />
-              Panel de Control - Gestión de Desechos
+              Panel de Control - Residuos Reales
             </h1>
-            <p>Análisis de reciclaje y gestión ambiental</p>
+            <p>Resumen agregado desde el backend para regiones y tratamientos de residuos</p>
           </div>
         </section>
 
         {/* KPIs */}
         <section className="kpi-section">
-          {[
-            { label: 'Total Reciclado (6 meses)', value: '3,500 kg', color: '#4ECDC4' },
-            { label: 'Promedio Mensual', value: '583 kg', color: '#45B7D1' },
-            { label: 'Mes Actual', value: '680 kg', color: '#FF6B6B' },
-            { label: 'Objetivo Anual', value: '8,000 kg', color: '#FFA07A' },
-          ].map((kpi, idx) => (
+          {kpis.map((kpi, idx) => (
             <div key={idx} className="kpi-card" style={{ borderLeftColor: kpi.color }}>
               <p className="kpi-label">{kpi.label}</p>
               <h3 className="kpi-value" style={{ color: kpi.color }}>
@@ -167,110 +183,157 @@ function Dashboard() {
 
         {/* Gráficos */}
         <div className="charts-section">
-          {!canViewReports && (
-            <div className="access-warning">
-              <AlertCircle size={24} className="access-warning-icon" />
-              <div className="access-warning-content">
-                <p>🔒 Acceso Limitado</p>
-                <p>
-                  Tu rol ({userRole?.label}) no tiene permiso para ver todos los reportes. 
-                  Contacta a un administrador si necesitas más acceso.
-                </p>
-              </div>
+
+          {isLoading && (
+            <div className="dashboard-status-card dashboard-status-card--loading">
+              <div className="dashboard-status-card__title">Cargando residuos reales...</div>
+              <p>Consultando el backend para regiones y tratamientos agregados.</p>
             </div>
           )}
 
-          {/* Gráfico de Desechos Reciclados por Mes */}
+          {errorMessage && (
+            <div className="dashboard-status-card dashboard-status-card--error">
+              <div className="dashboard-status-card__title">
+                <AlertCircle size={20} />
+                Error al cargar residuos
+              </div>
+              <p>{errorMessage}</p>
+              <button className="dashboard-status-card__retry" onClick={() => refetch()}>
+                Reintentar
+              </button>
+            </div>
+          )}
+
+          {!isLoading && !errorMessage && !dashboardData.hasData && (
+            <div className="dashboard-status-card dashboard-status-card--empty">
+              <div className="dashboard-status-card__title">Sin residuos agregados</div>
+              <p>El backend respondió correctamente, pero todavía no hay registros consolidados para mostrar.</p>
+            </div>
+          )}
+
           <div className="chart-card">
             <h2>
               <BarChart3 size={24} style={{ color: '#4ECDC4' }} />
-              Desechos Reciclados por Mes
+              Residuos por región
             </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={monthlyWasteData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                <XAxis dataKey="month" stroke="#888" />
-                <YAxis stroke="#888" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                  }}
-                />
-                <Legend />
-                <Bar dataKey="reciclado" fill="#4ECDC4" name="Reciclado (kg)" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="organico" fill="#98D8C8" name="Orgánico (kg)" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="plastico" fill="#FF6B6B" name="Plástico (kg)" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {isLoading ? (
+              <div className="chart-empty-state">Cargando gráfico...</div>
+            ) : dashboardData.regionData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={dashboardData.regionData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                  <XAxis 
+                        dataKey="label" 
+                        stroke="#888" 
+                        interval={0} 
+                        angle={-25} 
+                        textAnchor="end" 
+                        height={60} 
+                        tickFormatter={(label) => truncateLabel(label, 12)} 
+                      />
+                  <YAxis stroke="#888" tickFormatter={(value) => formatToneladas(value)} />
+                  <Tooltip
+                    formatter={(value) => [`${formatToneladas(value)} t`, 'Toneladas']}
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      border: '1px solid #ddd',
+                      borderRadius: '8px',
+                    }}
+                  />
+                  <Legend />
+                  <Bar dataKey="value" fill="#4ECDC4" name="Toneladas de residuos" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="chart-empty-state">No hay regiones con residuos para representar.</div>
+            )}
           </div>
 
-          {/* Gráfico de Desechos Más Reciclados */}
           <div className="chart-card">
             <h2>
               <PieChartIcon size={24} style={{ color: '#45B7D1' }} />
-              Distribución de Desechos Más Reciclados
+              Distribución por tratamiento
             </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={topWasteData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value }) => `${name} ${value}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {topWasteData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                  }}
-                  formatter={(value, name, props) => {
-                    if (name === 'kg') return `${value} kg`;
-                    return value;
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            {isLoading ? (
+              <div className="chart-empty-state">Cargando gráfico...</div>
+            ) : dashboardData.treatmentData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={dashboardData.treatmentData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={90}
+                    fill="#8884d8"
+                    dataKey="value"
+                    nameKey="label"
+                  >
+                    {dashboardData.treatmentData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value) => [`${formatToneladas(value)} t`, 'Toneladas']}
+                    contentStyle={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                      border: '1px solid #ddd',
+                      borderRadius: '8px',
+                    }}
+                  />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="chart-empty-state">No hay tratamientos con residuos para representar.</div>
+            )}
           </div>
         </div>
 
         {/* Tabla de Detalles */}
         <section className="table-section">
-          <h2>Desglose Detallado de Desechos</h2>
+          <h2>Desglose detallado por región</h2>
           <div className="table-wrapper">
             <table className="dashboard-table">
               <thead>
                 <tr>
-                  <th>Tipo de Desecho</th>
+                  <th>Región</th>
                   <th>Porcentaje</th>
-                  <th>Kilogramos</th>
-                  <th>Estado</th>
+                  <th>Toneladas</th>
+                  <th>Referencia</th>
                 </tr>
               </thead>
               <tbody>
-                {topWasteData.map((item, idx) => (
+                {dashboardData.regionData.map((item, idx) => (
                   <tr key={idx}>
-                    <td>{item.name}</td>
-                    <td>{item.value}%</td>
-                    <td>{item.kg.toLocaleString()}</td>
+                    <td>{item.label}</td>
+                    <td>{item.percentage.toFixed(1)}%</td>
+                    <td>{formatToneladas(item.value)}</td>
                     <td>
-                      <span className="table-status-badge">✓ Procesado</span>
+                      <span className="table-status-badge">Backend SINADER</span>
                     </td>
                   </tr>
                 ))}
+                {!dashboardData.regionData.length && (
+                  <tr>
+                    <td colSpan="4" className="table-empty-row">
+                      Sin datos para mostrar.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
+          <p className="table-footnote">
+            Fuente: <strong>regiones</strong> y <strong>tratamientos</strong> agregados desde /api/sinader.
+            {dashboardData.metrics.topRegion && (
+              <> Región líder: <strong>{topRegion}</strong>.</>
+            )}
+            {dashboardData.metrics.topTreatment && (
+              <> Tratamiento líder: <strong>{topTreatment}</strong>.</>
+            )}
+            {isFetching && !isLoading && ' Actualizando datos...'}
+          </p>
         </section>
       </main>
     </div>

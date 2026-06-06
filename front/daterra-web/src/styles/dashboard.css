@@ -7,7 +7,7 @@
   display: flex;
   min-height: 100vh;
   background-color: #f8f9fa;
-  font-family: 'Source Sans Pro, sans-serif';
+  font-family: 'Inter', sans-serif;
 }
 
 /* Sidebar - Dashboard variant */
@@ -203,9 +203,10 @@
 /* Charts Section */
 .charts-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
   gap: 2em;
   margin-bottom: 2em;
+  align-items: start;
 }
 
 .chart-card {
@@ -223,6 +224,7 @@
   display: flex;
   align-items: center;
   gap: 0.5em;
+  line-height: 1.2;
 }
 
 /* Table Section */
@@ -277,6 +279,102 @@
   font-weight: bold;
 }
 
+.table-empty-row {
+  text-align: center;
+  color: #777;
+  padding: 1.5em 1em;
+}
+
+.table-footnote {
+  margin: 1rem 0 0;
+  color: #666;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.dashboard-status-card {
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid transparent;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-status-card__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-status-card--loading {
+  background: linear-gradient(135deg, rgba(78, 205, 196, 0.14), rgba(69, 183, 209, 0.12));
+  border-color: rgba(78, 205, 196, 0.28);
+}
+
+.dashboard-status-card--error {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 160, 122, 0.12));
+  border-color: rgba(255, 107, 107, 0.3);
+}
+
+.dashboard-status-card--empty {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.12), rgba(255, 224, 130, 0.12));
+  border-color: rgba(255, 193, 7, 0.25);
+}
+
+.dashboard-status-card__retry {
+  appearance: none;
+  border: none;
+  background: #2e354f;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dashboard-status-card__retry:hover {
+  background: #1f2538;
+}
+
+.chart-empty-state {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #666;
+  background: linear-gradient(180deg, rgba(248, 249, 250, 0.95), rgba(255, 255, 255, 0.95));
+  border: 1px dashed #cfd8dc;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+@media (max-width: 900px) {
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card {
+    padding: 1.5em;
+  }
+
+  .table-section {
+    padding: 1.5em;
+  }
+
+  .chart-card h2,
+  .table-section h2 {
+    font-size: 1.15em;
+  }
+}
+
+.kpi-card .kpi-label {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 /* Access Warning Section */
 .access-warning {
   background-color: #fff3cd;
@@ -316,3 +414,30 @@
   border-radius: 8px;
   padding: 0.5em;
 }
+
+/* Legend / Axis text overlap fixes (Recharts) */
+.chart-card .recharts-legend-wrapper {
+  max-width: 100%;
+}
+
+.chart-card .recharts-default-legend {
+  font-size: 0.78em;
+}
+
+.chart-card .recharts-legend-item {
+  margin-right: 0.75rem;
+}
+
+.chart-card .recharts-legend-item-text,
+.chart-card .recharts-legend-item-text tspan {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.chart-card .recharts-cartesian-axis-tick-value {
+  font-size: 0.78em;
+}
+
