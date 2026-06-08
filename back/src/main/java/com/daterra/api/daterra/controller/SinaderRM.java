@@ -112,5 +112,32 @@ public class SinaderRM {
         }
         return list;
     }
+    @GetMapping("/rm/materiales/por-año")
+    public List<Map<String, Object>> getMaterialesPorAño() {
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (Object[] r : repository.materialPorAño()) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("año",            r[0]);
+            m.put("material",       r[1]);
+            m.put("registros",      r[2]);
+            m.put("totalToneladas", r[3] != null ? ((Number) r[3]).doubleValue() : 0);
+            list.add(m);
+        }
+        return list;
+    }
+
+    @GetMapping("/rm/materiales/por-año/{año}")
+    public List<Map<String, Object>> getMaterialesPorAñoFiltrado(@PathVariable Integer año) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (Object[] r : repository.materialPorAñoFiltrado(año)) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("año",            r[0]);
+            m.put("material",       r[1]);
+            m.put("registros",      r[2]);
+            m.put("totalToneladas", r[3] != null ? ((Number) r[3]).doubleValue() : 0);
+            list.add(m);
+        }
+        return list;
+    }
 
 }

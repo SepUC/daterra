@@ -93,4 +93,27 @@ public interface SinaderEstadisticasRepository extends JpaRepository<SinaderRM, 
     ORDER BY año ASC, total_toneladas DESC
     """, nativeQuery = true)
     List<Object[]> registroPorComunaYAño();
+    @Query(value = """
+    SELECT año, nombre_ler, COUNT(*) as registros,
+           SUM(cantidad_toneladas) as total_toneladas
+    FROM RETC.SINADER_ALL
+    WHERE region LIKE '%Metropolitana%'
+    AND nombre_ler IS NOT NULL AND nombre_ler != ''
+    GROUP BY año, nombre_ler
+    ORDER BY año ASC, total_toneladas DESC
+    """, nativeQuery = true)
+    List<Object[]> materialPorAño();
+
+    @Query(value = """
+    SELECT año, nombre_ler, COUNT(*) as registros,
+           SUM(cantidad_toneladas) as total_toneladas
+    FROM RETC.SINADER_ALL
+    WHERE region LIKE '%Metropolitana%'
+    AND nombre_ler IS NOT NULL AND nombre_ler != ''
+    AND año = :año
+    GROUP BY año, nombre_ler
+    ORDER BY total_toneladas DESC
+    LIMIT 10
+    """, nativeQuery = true)
+    List<Object[]> materialPorAñoFiltrado(@Param("año") Integer año);
 }
