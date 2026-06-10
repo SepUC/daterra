@@ -1,31 +1,23 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import apiService from '../services/apiService';
-import { validateTestCredentials, hasPermission } from '../constants/testUsers';
+// 1. Importamos tus nuevos servicios de Axios
+import { login as apiLogin, register as apiRegister } from '../services/authService';
+import { hasPermission } from '../constants/testUsers';
 
-/**
- * AuthContext - Contexto global de autenticación
- * Maneja el estado del usuario autenticado y operaciones de auth
- */
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [token, setToken] = useState(null);
 
-  // Verificar autenticación al cargar
+  // Verificar sesión al cargar la página
   useEffect(() => {
-    const storedToken = localStorage.getItem('authToken');
     const storedUser = localStorage.getItem('currentUser');
-
-    if (storedToken && storedUser) {
+    if (storedUser) {
       try {
-        setToken(storedToken);
         setUser(JSON.parse(storedUser));
       } catch (err) {
         console.error('Error restaurando sesión:', err);
-        localStorage.removeItem('authToken');
         localStorage.removeItem('currentUser');
       }
     }
@@ -33,45 +25,25 @@ export function AuthProvider({ children }) {
   }, []);
 
   /**
-   * Función de login
+   * Login adaptado para Spring Boot (AWS)
    */
   const login = async (email, password) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Intentar con API real primero
-      let response;
-      try {
-        response = await apiService.login(email, password);
-      } catch (apiError) {
-        console.log('Backend no disponible, usando test users...');
-        
-        // Si el backend no está disponible, usar test users
-        const testUser = validateTestCredentials(email, password);
-        if (!testUser) {
-          throw new Error('Credenciales inválidas');
-        }
+      // 2. Llamamos al servicio que usa Axios hacia http://localhost:8080/api/auth/login
+      const userData = await apiLogin(email, password);
 
-        // Crear un token simulado
-        const mockToken = `mock-token-${testUser.id}-${Date.now()}`;
-        response = {
-          token: mockToken,
-          user: testUser,
-        };
-      }
+      // 3. Guardamos el objeto usuario que viene de Java (Jose Vargas)
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+      setUser(userData);
 
-      // Guardar token y usuario
-      localStorage.setItem('authToken', response.token);
-      localStorage.setItem('currentUser', JSON.stringify(response.user));
-
-      setToken(response.token);
-      setUser(response.user);
       setIsLoading(false);
-
-      return response.user;
+      return userData;
     } catch (err) {
-      const errorMessage = err.message || 'Error en login';
+      // El error viene de lo que configuramos en authService.js
+      const errorMessage = typeof err === 'string' ? err : 'Credenciales inválidas';
       setError(errorMessage);
       setIsLoading(false);
       throw new Error(errorMessage);
@@ -79,92 +51,40 @@ export function AuthProvider({ children }) {
   };
 
   /**
-   * Función de registro
+   * Registro adaptado
    */
-  const register = async (name, email, password) => {
+  const register = async (userData) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Intentar con API real primero
-      let response;
-      try {
-        response = await apiService.register(name, email, password);
-      } catch (apiError) {
-        console.log('Backend no disponible, crear usuario en test...');
-        
-        // Crear usuario de prueba
-        const newUser = {
-          id: Math.random() * 1000,
-          name,
-          email,
-          role: 'viewer',
-          permissions: ['view_own_data'],
-          municipality: null,
-          status: 'active',
-          createdAt: new Date().toISOString(),
-        };
+      const newUser = await apiRegister(userData);
 
-        const mockToken = `mock-token-${newUser.id}-${Date.now()}`;
-        response = {
-          token: mockToken,
-          user: newUser,
-        };
-      }
+      localStorage.setItem('currentUser', JSON.stringify(newUser));
+      setUser(newUser);
 
-      // Guardar token y usuario
-      localStorage.setItem('authToken', response.token);
-      localStorage.setItem('currentUser', JSON.stringify(response.user));
-
-      setToken(response.token);
-      setUser(response.user);
       setIsLoading(false);
-
-      return response.user;
+      return newUser;
     } catch (err) {
-      const errorMessage = err.message || 'Error en registro';
-      setError(errorMessage);
+      setError(err);
       setIsLoading(false);
-      throw new Error(errorMessage);
+      throw new Error(err);
     }
   };
 
-  /**
-   * Función de logout
-   */
-  const logout = async () => {
-    setIsLoading(true);
-
-    try {
-      // Intentar logout en backend
-      try {
-        await apiService.logout();
-      } catch (err) {
-        console.log('Error desconectando del backend, continuando...');
-      }
-
-      // Limpiar storage
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('currentUser');
-
-      setToken(null);
-      setUser(null);
-    } finally {
-      setIsLoading(false);
-    }
+  const logout = () => {
+    localStorage.removeItem('currentUser');
+    setUser(null);
   };
 
-  /**
-   * Verificar si el usuario tiene un permiso específico
-   */
   const checkPermission = (permission) => {
     if (!user) return false;
-    return hasPermission(user.role, permission);
+    // Adaptamos según el rol que traiga tu tabla USUARIO (si tiene uno)
+    return hasPermission(user.rol || 'viewer', permission);
   };
 
   const value = {
     user,
-    token,
     isLoading,
     error,
     login,
@@ -177,9 +97,6 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-/**
- * Hook para usar el contexto de autenticación
- */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

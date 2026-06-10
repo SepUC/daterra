@@ -1,0 +1,326 @@
+/* ========================================
+   MAP CIUDADANO SPECIFIC STYLES
+   ======================================== */
+
+/* Main Container */
+.map-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+/* Sidebar - Map variant */
+.map-sidebar {
+  width: 260px;
+  background-color: #4ee66f;
+  color: #2e354f;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5em;
+  flex-shrink: 0;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Main content area for map */
+.map-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Header for map view */
+.map-header {
+  background-color: #66c388;
+  color: #fff;
+  padding: 1em 2em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.map-header h1 {
+  margin: 0;
+  font-size: 1.4em;
+  font-weight: 500;
+}
+
+.map-header-subtitle {
+  font-size: 0.8em;
+  opacity: 0.85;
+}
+
+/* Sync button */
+.sync-button {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border: none;
+  padding: 0.5em 1em;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 0.85em;
+  transition: background-color 0.2s;
+}
+
+.sync-button:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.sync-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sync-icon.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Workspace Grid - Map and sidebar panel */
+.map-workspace {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  height: calc(100vh - 70px);
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Left Panel - Points List */
+.points-panel {
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: calc(100vh - 70px);
+  background-color: #fff;
+  overflow: hidden;
+}
+
+/* Points panel header */
+.points-panel-header {
+  padding: 1.2em;
+  border-bottom: 1px solid #edf2f7;
+  flex-shrink: 0;
+}
+
+.points-count-label {
+  font-size: 0.8em;
+  color: #718096;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.points-count-value {
+  font-size: 1.3em;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0.2em 0;
+}
+
+/* Points panel scrollable area */
+.points-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 100%;
+  background-color: #fff;
+  padding-right: 2px;
+}
+
+.points-list-empty {
+  padding: 2em;
+  text-align: center;
+  color: #a0aec0;
+  font-size: 0.9em;
+}
+
+/* Individual point item */
+.point-item {
+  padding: 1.1em 1.4em;
+  border-bottom: 1px solid #f7fafc;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.point-item:hover {
+  background-color: #f7fafc;
+}
+
+.point-item-name {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 0.9em;
+  margin-bottom: 0.2em;
+}
+
+.point-item-address {
+  font-size: 0.78em;
+  color: #718096;
+  margin-bottom: 0.5em;
+}
+
+.point-item-type {
+  font-size: 0.65em;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  display: inline-block;
+}
+
+.point-item-type.clean {
+  background-color: #e6fffa;
+  color: #047481;
+}
+
+.point-item-type.green {
+  background-color: #ebf8ff;
+  color: #2b6cb0;
+}
+
+/* Right Panel - Map Container */
+.map-viewer {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: #e5e9f0;
+}
+
+.map-canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Leaflet overrides for custom styling */
+.leaflet-container {
+  font-family: 'Inter', sans-serif;
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  padding: 0.5em;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.popup-content {
+  min-width: 150px;
+}
+
+.popup-content strong {
+  font-size: 0.95em;
+  display: block;
+}
+
+.popup-content span {
+  font-size: 0.85em;
+  color: #555;
+  margin-top: 3px;
+  display: inline-block;
+}
+
+/* Filter buttons in map */
+.map-filter-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 0.8em;
+}
+
+.map-filter-btn {
+  padding: 8px 0;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.78em;
+  cursor: pointer;
+  font-weight: 600;
+  text-align: center;
+  background-color: #f7fafc;
+  color: #4a5568;
+  transition: all 0.15s ease;
+}
+
+.map-filter-btn.active {
+  background-color: #4c785c;
+  color: #fff;
+}
+
+.map-filter-btn:hover:not(.active) {
+  background-color: #eef2f7;
+}
+
+/* Map markers styling */
+.map-marker-center {
+  fill-color: #718096;
+  color: #4a5568;
+  weight: 2;
+  fill-opacity: 0.9;
+}
+
+.map-marker-point {
+  color: #ffffff;
+  weight: 1.5;
+  fill-opacity: 0.85;
+}
+
+.map-marker-point.clean {
+  fill-color: #2b6cb0;
+}
+
+.map-marker-point.green {
+  fill-color: #1e4620;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .map-workspace {
+    grid-template-columns: 300px 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .map-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .points-panel {
+    display: none;
+  }
+
+  .map-header {
+    padding: 0.8em 1.2em;
+  }
+
+  .map-header h1 {
+    font-size: 1.1em;
+  }
+}

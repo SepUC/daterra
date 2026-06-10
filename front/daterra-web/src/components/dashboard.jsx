@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../context/AuthContext';
-import { ROLE_PERMISSIONS, hasPermission } from '../constants/testUsers';
+import apiService from '../services/apiService';
+import { formatToneladas, normalizeDashboardError } from '../utils/wasteAnalytics';
 import {
   BarChart,
   Bar,
-  LineChart,
-  Line,
   PieChart,
   Pie,
   Cell,
@@ -16,35 +16,69 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ComposedChart
 } from 'recharts';
-import { Menu, LogOut, BarChart3, PieChart as PieChartIcon, Trash2, Shield, AlertCircle } from 'lucide-react';
+import { Menu, LogOut, BarChart3, PieChart as PieChartIcon, Target, AlertCircle, Calendar } from 'lucide-react';
 import '../assets/css/main.css';
 import '../assets/css/fontawesome-all.min.css';
+import '../styles/shared.css';
+import '../styles/dashboard.css';
 
-// Datos de ejemplo para gráficos
-const monthlyWasteData = [
-  { month: 'Enero', reciclado: 450, organico: 300, plastico: 200 },
-  { month: 'Febrero', reciclado: 520, organico: 280, plastico: 220 },
-  { month: 'Marzo', reciclado: 480, organico: 310, plastico: 190 },
-  { month: 'Abril', reciclado: 650, organico: 350, plastico: 250 },
-  { month: 'Mayo', reciclado: 720, organico: 400, plastico: 280 },
-  { month: 'Junio', reciclado: 680, organico: 380, plastico: 260 },
-];
+const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#B19CD9'];
 
-const topWasteData = [
-  { name: 'Plástico', value: 35, kg: 1200 },
-  { name: 'Papel', value: 25, kg: 850 },
-  { name: 'Metal', value: 20, kg: 680 },
-  { name: 'Vidrio', value: 15, kg: 510 },
-  { name: 'Otros', value: 5, kg: 170 },
-];
+// ==========================================
+// 1. METAS FINALES DE LA LEY REP Y ENRO (%)
+// ==========================================
+const METAS_VALORIZACION = {
+  'Papel y cartón': 70,
+  'Vidrio': 65,
+  'Cartón para líquidos': 60,
+  'Metal': 55,
+  'Plásticos': 45,
+  'Orgánicos (ENRO)': 30, // Meta intermedia al 2030
+};
 
-const COLORS = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8'];
+// ==========================================
+// 2. FUNCIÓN PARA NORMALIZAR TEXTO (AJUSTADA A DATOS REALES SINADER RM)
+// ==========================================
+const normalizarCategoriaREP = (rawMaterial) => {
+  if (!rawMaterial) return 'Otros';
+  
+  const texto = rawMaterial.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+
+  // MATERIALES RECICLABLES (Envases y Embalajes)
+  if (texto.includes('papel') || texto.includes('carton')) return 'Papel y cartón';
+  if (texto.includes('vidrio')) return 'Vidrio';
+  if (texto.includes('plastic') || texto.includes('plastico')) return 'Plásticos';
+  if (texto.includes('tetra') || texto.includes('liquido')) return 'Cartón para líquidos';
+  if (texto.includes('metal') || texto.includes('chatarra') || texto.includes('aluminio')) return 'Metal';
+  
+  // RESIDUOS ORGÁNICOS (ENRO)
+  if (texto.includes('biodegradable') || texto.includes('organic') || texto.includes('poda')) return 'Orgánicos (ENRO)';
+  
+  // BASURA COMÚN Y NO RECICLABLES
+  return 'Otros'; 
+};
 
 function Dashboard() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { user, logout, checkPermission } = useAuth();
+  const { user, logout } = useAuth();
+  
+  const [anoSeleccionado, setAnoSeleccionado] = useState(2021);
+
+  const {
+    data: estadisticasRM,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['sinader-rm-dashboard', anoSeleccionado], 
+    queryFn: () => apiService.getEstadisticasRM(anoSeleccionado),
+    retry: 1,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const handleLogout = async () => {
     try {
@@ -56,128 +90,90 @@ function Dashboard() {
     }
   };
 
-  if (!user) {
-    return <div>Cargando...</div>;
-  }
+  if (!user) return <div>Cargando usuario...</div>;
 
-  const userRole = ROLE_PERMISSIONS[user.role];
-  const canRecordWaste = checkPermission('record_waste');
-  const canViewReports = checkPermission('view_reports');
+  const errorMessage = isError ? normalizeDashboardError(error) : null;
+
+  // ==========================================
+  // TRANSFORMACIÓN Y AGRUPACIÓN DE DATOS
+  // ==========================================
+  const comunasData = estadisticasRM?.topComunasPorToneladas || [];
+  const materialesRaw = estadisticasRM?.materialesPorToneladas || [];
+  
+  const totalToneladasRM = comunasData.reduce((acc, curr) => acc + (curr.toneladas || curr.totalToneladas || 0), 0);
+  const totalComunas = comunasData.length;
+
+  const toneladasAgrupadasPorREP = {};
+  
+  // Agrupamos usando nuestro filtro normalizador
+  materialesRaw.forEach(mat => {
+    const toneladas = mat.toneladas || mat.totalToneladas || 0; 
+    const categoriaREP = normalizarCategoriaREP(mat.material);
+    
+    if (categoriaREP !== 'Otros') {
+      if (!toneladasAgrupadasPorREP[categoriaREP]) {
+        toneladasAgrupadasPorREP[categoriaREP] = 0;
+      }
+      toneladasAgrupadasPorREP[categoriaREP] += toneladas;
+    }
+  });
+
+  // 1. Data para Gráfico de Torta (Distribución)
+  const dataGraficoTorta = Object.keys(toneladasAgrupadasPorREP)
+    .map(key => ({
+      name: key,
+      value: parseFloat(toneladasAgrupadasPorREP[key].toFixed(2)),
+    }))
+    .filter(item => item.value > 0);
+
+  // 2. Data para Gráfico de Metas Ley REP (Barras Compuestas)
+  // Calculamos el total SOLO de los residuos reciclables para obtener un % realista
+  const totalReciclables = Object.keys(toneladasAgrupadasPorREP)
+    .reduce((acc, key) => acc + toneladasAgrupadasPorREP[key], 0);
+
+  const dataMetas = Object.keys(METAS_VALORIZACION).map(key => {
+    const toneladasRecolectadas = toneladasAgrupadasPorREP[key] || 0;
+    
+    // El cálculo ahora se hace sobre la bolsa de reciclables, ignorando la basura común
+    const porcentajeLogradoSimulado = totalReciclables > 0 
+      ? (toneladasRecolectadas / totalReciclables) * 100 
+      : 0;
+
+    return {
+      material: key,
+      actual: parseFloat(porcentajeLogradoSimulado.toFixed(1)),
+      meta: METAS_VALORIZACION[key],
+      toneladas: parseFloat(toneladasRecolectadas.toFixed(1))
+    };
+  });
+
+  const truncateLabel = (label, maxLength = 12) => {
+    if (!label) return '';
+    return label.length > maxLength ? label.substring(0, maxLength) + '...' : label;
+  };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+    <div className="dashboard-container">
       {/* Sidebar */}
-      <aside
-        style={{
-          width: sidebarOpen ? '280px' : '80px',
-          backgroundColor: 'rgba(50, 60, 90, 0.95)',
-          color: '#fff',
-          padding: '2em 1em',
-          transition: 'width 0.3s ease',
-          position: 'fixed',
-          height: '100vh',
-          overflowY: 'auto',
-          zIndex: 1000,
-          boxShadow: '2px 0 10px rgba(0,0,0,0.2)',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '2em',
-            paddingBottom: '1.5em',
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
-          }}
-        >
+      <aside className="dashboard-sidebar" style={{ width: sidebarOpen ? '280px' : '80px' }}>
+        <div className="sidebar-title-section">
           {sidebarOpen && (
-            <h2 style={{ margin: 0, fontSize: '1.5em', fontWeight: 'bold' }}>
-              <Trash2 size={24} style={{ display: 'inline', marginRight: '0.5em' }} />
-              Daterra
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <img src="full_logo.png" alt="Daterra" style={{ height: '10em', width: 'auto', maxHeight: '70px' }} />
+            </div>
           )}
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#fff',
-              cursor: 'pointer',
-              fontSize: '1.5em',
-              padding: '0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
+          <button className="sidebar-toggle-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
             <Menu size={24} />
           </button>
         </div>
-
-        {/* Navegación */}
-        <nav style={{ marginBottom: '3em' }}>
-          <div
-            style={{
-              padding: '1em',
-              borderRadius: '8px',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              marginBottom: '1em',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75em',
-              transition: 'backgroundColor 0.2s',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)')}
-          >
+        <nav className="dashboard-nav">
+          <div className="nav-item">
             <BarChart3 size={20} />
-            {sidebarOpen && <span>Dashboard</span>}
+            {sidebarOpen && <span>Dashboard RM</span>}
           </div>
         </nav>
-
-        {/* Usuario */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '2em',
-            left: '1em',
-            right: '1em',
-            borderTop: '1px solid rgba(255,255,255,0.1)',
-            paddingTop: '1.5em',
-          }}
-        >
-          {sidebarOpen && (
-            <div style={{ marginBottom: '1.5em' }}>
-              <p style={{ margin: '0 0 0.5em 0', fontSize: '0.9em', opacity: 0.8 }}>Conectado como</p>
-              <p style={{ margin: 0, fontWeight: 'bold', wordBreak: 'break-word' }}>{user.name}</p>
-              <p style={{ margin: '0.3em 0 0 0', fontSize: '0.8em', opacity: 0.7 }}>
-                <Shield size={12} style={{ display: 'inline', marginRight: '0.3em' }} />
-                {userRole?.label}
-              </p>
-            </div>
-          )}
-          <button
-            onClick={handleLogout}
-            style={{
-              width: '100%',
-              padding: '0.75em',
-              backgroundColor: '#FF6B6B',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5em',
-              transition: 'backgroundColor 0.2s',
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#e85555')}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#FF6B6B')}
-          >
+        <div className="sidebar-user-section">
+          <button className="btn-logout" onClick={handleLogout}>
             <LogOut size={18} />
             {sidebarOpen && <span>Cerrar Sesión</span>}
           </button>
@@ -185,245 +181,152 @@ function Dashboard() {
       </aside>
 
       {/* Contenido Principal */}
-      <main
-        style={{
-          marginLeft: sidebarOpen ? '280px' : '80px',
-          flex: 1,
-          padding: '2em',
-          transition: 'margin-left 0.3s ease',
-        }}
-      >
-        {/* Información de Seguridad y Rol del Usuario */}
-        {user && (
-          <section style={{ marginBottom: '2em' }}>
-            <div style={{ 
-              backgroundColor: '#e8f5e9', 
-              padding: '1.5em', 
-              borderRadius: '12px', 
-              borderLeft: `5px solid ${userRole?.color || '#999'}`,
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-            }}>
-              <div style={{ display: 'flex', gap: '1em', alignItems: 'start' }}>
-                <Shield size={24} style={{ color: userRole?.color, marginTop: '0.2em' }} />
-                <div style={{ flex: 1 }}>
-                  <h3 style={{ margin: '0 0 0.5em 0', color: '#333' }}>
-                    👤 {user.name}
-                  </h3>
-                  <p style={{ margin: '0 0 0.3em 0', color: '#666', fontSize: '0.95em' }}>
-                    <strong>Rol:</strong> {userRole?.label}
-                  </p>
-                  <p style={{ margin: '0 0 0.3em 0', color: '#666', fontSize: '0.95em' }}>
-                    <strong>Correo:</strong> {user.email}
-                  </p>
-                  {user.municipality && (
-                    <p style={{ margin: '0 0 0.3em 0', color: '#666', fontSize: '0.95em' }}>
-                      <strong>Municipalidad:</strong> {user.municipality}
-                    </p>
-                  )}
-                  <p style={{ margin: '0.5em 0 0 0', color: '#666', fontSize: '0.9em' }}>
-                    <strong>Permisos:</strong> {user.permissions?.length || 0} permisos asignados
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Header */}
-        <section style={{ marginBottom: '3em' }}>
-          <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', padding: '2em', borderRadius: '15px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
-            <h1 style={{ margin: 0, color: '#323C5A', fontSize: '2.5em', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-              <BarChart3 size={32} style={{ color: '#4ECDC4' }} />
-              Panel de Control - Gestión de Desechos
+      <main className={`dashboard-main ${!sidebarOpen ? 'sidebar-collapsed' : ''}`}>
+        
+        <section style={{ marginBottom: '3em', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="card-header" style={{ flex: 1 }}>
+            <h1>
+              <BarChart3 size={32} style={{ color: '#4ECDC4', marginRight: '10px' }} />
+              Panel SINADER - Región Metropolitana
             </h1>
-            <p style={{ margin: '0.5em 0 0 0', color: '#666' }}>Análisis de reciclaje y gestión ambiental</p>
+            <p>Monitoreo de toneladas por comuna y cumplimiento Ley REP / ENRO</p>
+          </div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', backgroundColor: '#fff', padding: '10px 15px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+            <Calendar size={20} style={{ color: '#666', marginRight: '10px' }} />
+            <label htmlFor="yearSelect" style={{ marginRight: '10px', fontWeight: 'bold', color: '#444' }}>Año:</label>
+            <select 
+              id="yearSelect" 
+              value={anoSeleccionado} 
+              onChange={(e) => setAnoSeleccionado(parseInt(e.target.value))}
+              style={{ padding: '5px', borderRadius: '4px', border: '1px solid #ccc' }}
+            >
+              <option value={2024}>2024</option>
+              <option value={2023}>2023</option>
+              <option value={2022}>2022</option>
+              <option value={2021}>2021</option>
+              <option value={2020}>2020</option>
+            </select>
           </div>
         </section>
 
         {/* KPIs */}
-        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5em', marginBottom: '2em' }}>
-          {[
-            { label: 'Total Reciclado (6 meses)', value: '3,500 kg', color: '#4ECDC4' },
-            { label: 'Promedio Mensual', value: '583 kg', color: '#45B7D1' },
-            { label: 'Mes Actual', value: '680 kg', color: '#FF6B6B' },
-            { label: 'Objetivo Anual', value: '8,000 kg', color: '#FFA07A' },
-          ].map((kpi, idx) => (
-            <div
-              key={idx}
-              style={{
-                backgroundColor: '#fff',
-                padding: '1.5em',
-                borderRadius: '12px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                borderLeft: `5px solid ${kpi.color}`,
-              }}
-            >
-              <p style={{ margin: 0, color: '#888', fontSize: '0.9em', fontWeight: 'bold' }}>{kpi.label}</p>
-              <h3 style={{ margin: '0.5em 0 0 0', color: kpi.color, fontSize: '1.8em', fontWeight: 'bold' }}>
-                {kpi.value}
-              </h3>
-            </div>
-          ))}
+        <section className="kpi-section">
+          <div className="kpi-card" style={{ borderLeftColor: '#4ECDC4' }}>
+            <p className="kpi-label">Toneladas Totales RM ({anoSeleccionado})</p>
+            <h3 className="kpi-value" style={{ color: '#4ECDC4' }}>{formatToneladas(totalToneladasRM)} t</h3>
+          </div>
+          <div className="kpi-card" style={{ borderLeftColor: '#45B7D1' }}>
+            <p className="kpi-label">Comunas Activas</p>
+            <h3 className="kpi-value" style={{ color: '#45B7D1' }}>{totalComunas}</h3>
+          </div>
         </section>
 
-        {/* Gráficos */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '2em', marginBottom: '2em' }}>
-          {!canViewReports && (
-            <div style={{
-              gridColumn: '1 / -1',
-              backgroundColor: '#fff3cd',
-              padding: '1.5em',
-              borderRadius: '12px',
-              border: '1px solid #ffc107',
-              display: 'flex',
-              gap: '1em',
-              alignItems: 'start'
-            }}>
-              <AlertCircle size={24} style={{ color: '#ff9800', marginTop: '0.2em' }} />
-              <div>
-                <p style={{ margin: '0 0 0.5em 0', fontWeight: 'bold', color: '#333' }}>
-                  🔒 Acceso Limitado
-                </p>
-                <p style={{ margin: '0', color: '#666' }}>
-                  Tu rol ({userRole?.label}) no tiene permiso para ver todos los reportes. 
-                  Contacta a un administrador si necesitas más acceso.
-                </p>
-              </div>
+        <div className="charts-section">
+          {isLoading && (
+            <div className="dashboard-status-card dashboard-status-card--loading">
+              <p>Cargando datos del año {anoSeleccionado}...</p>
             </div>
           )}
 
-          {/* Gráfico de Desechos Reciclados por Mes */}
-          <div
-            style={{
-              backgroundColor: '#fff',
-              padding: '2em',
-              borderRadius: '12px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <h2 style={{ margin: '0 0 1.5em 0', color: '#323C5A', fontSize: '1.3em', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-              <BarChart3 size={24} style={{ color: '#4ECDC4' }} />
-              Desechos Reciclados por Mes
+          {errorMessage && (
+            <div className="dashboard-status-card dashboard-status-card--error">
+              <AlertCircle size={20} />
+              <p>{errorMessage}</p>
+              <button onClick={() => refetch()}>Reintentar</button>
+            </div>
+          )}
+
+          {/* Gráfico 1: Toneladas por Comuna RM */}
+          <div className="chart-card">
+            <h2>
+              <BarChart3 size={24} style={{ color: '#4ECDC4', marginRight: '8px' }} />
+              Toneladas Totales por Comuna
             </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={monthlyWasteData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                <XAxis dataKey="month" stroke="#888" />
-                <YAxis stroke="#888" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                  }}
-                />
-                <Legend />
-                <Bar dataKey="reciclado" fill="#4ECDC4" name="Reciclado (kg)" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="organico" fill="#98D8C8" name="Orgánico (kg)" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="plastico" fill="#FF6B6B" name="Plástico (kg)" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {comunasData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={350}>
+                <BarChart data={comunasData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                  <XAxis 
+                    dataKey="comuna" 
+                    stroke="#888" 
+                    interval={0} 
+                    angle={-45} 
+                    textAnchor="end" 
+                    tickFormatter={(label) => truncateLabel(label, 15)} 
+                  />
+                  <YAxis stroke="#888" tickFormatter={(value) => formatToneladas(value)} />
+                  <Tooltip formatter={(value) => [`${formatToneladas(value)} t`, 'Toneladas Totales']} />
+                  <Bar dataKey="toneladas" fill="#4ECDC4" name="Toneladas Declaradas" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="chart-empty-state">No hay datos de comunas para el año seleccionado.</p>
+            )}
           </div>
 
-          {/* Gráfico de Desechos Más Reciclados */}
-          <div
-            style={{
-              backgroundColor: '#fff',
-              padding: '2em',
-              borderRadius: '12px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-          >
-            <h2 style={{ margin: '0 0 1.5em 0', color: '#323C5A', fontSize: '1.3em', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5em' }}>
-              <PieChartIcon size={24} style={{ color: '#45B7D1' }} />
-              Distribución de Desechos Más Reciclados
+          {/* Gráfico 2: Metas Ley REP */}
+          <div className="chart-card">
+            <h2>
+              <Target size={24} style={{ color: '#FF6B6B', marginRight: '8px' }} />
+              Cumplimiento Metas Ley REP y ENRO (%)
             </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={topWasteData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value }) => `${name} ${value}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {topWasteData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                  }}
-                  formatter={(value, name, props) => {
-                    if (name === 'kg') return `${value} kg`;
-                    return value;
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            <p style={{ fontSize: '0.85em', color: '#666', marginBottom: '15px' }}>
+              Comparativa de valorización simulada vs meta final exigida a 12 años.
+            </p>
+            {dataMetas.length > 0 ? (
+              <ResponsiveContainer width="100%" height={350}>
+                <ComposedChart data={dataMetas} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                  <XAxis dataKey="material" stroke="#888" />
+                  <YAxis unit="%" domain={[0, 100]} stroke="#888" />
+                  <Tooltip 
+                    formatter={(value, name) => [`${value}%`, name === 'actual' ? 'Valorización Actual' : 'Meta Ley/ENRO']} 
+                  />
+                  <Legend />
+                  <Bar dataKey="actual" fill="#FF6B6B" name="% Actual" radius={[4, 4, 0, 0]} maxBarSize={60} />
+                  <Bar dataKey="meta" fill="#e0e0e0" name="% Meta Esperada" radius={[4, 4, 0, 0]} maxBarSize={60} />
+                </ComposedChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="chart-empty-state">No hay datos suficientes para calcular las metas este año.</p>
+            )}
           </div>
+
+          {/* Gráfico 3: Distribución Ley REP y ENRO */}
+          <div className="chart-card">
+            <h2>
+              <PieChartIcon size={24} style={{ color: '#45B7D1', marginRight: '8px' }} />
+              Distribución de Residuos Regulados
+            </h2>
+            <p style={{ fontSize: '0.85em', color: '#666', marginBottom: '15px' }}>
+              Excluye basura municipal, enfocándose solo en reciclables y orgánicos.
+            </p>
+            {dataGraficoTorta.length > 0 ? (
+              <ResponsiveContainer width="100%" height={320}>
+                <PieChart>
+                  <Pie
+                    data={dataGraficoTorta}
+                    cx="50%" cy="50%"
+                    innerRadius={70} 
+                    outerRadius={100}
+                    paddingAngle={3}
+                    dataKey="value" nameKey="name"
+                  >
+                    {dataGraficoTorta.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => [`${formatToneladas(value)} t`, 'Total Recuperado']} />
+                  <Legend layout="horizontal" verticalAlign="bottom" align="center" />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="chart-empty-state">No se encontraron residuos reciclables/orgánicos este año.</div>
+            )}
+          </div>
+
         </div>
-
-        {/* Tabla de Detalles */}
-        <section
-          style={{
-            backgroundColor: '#fff',
-            padding: '2em',
-            borderRadius: '12px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-          }}
-        >
-          <h2 style={{ margin: '0 0 1.5em 0', color: '#323C5A', fontSize: '1.3em', fontWeight: 'bold' }}>
-            Desglose Detallado de Desechos
-          </h2>
-          <div style={{ overflowX: 'auto' }}>
-            <table
-              style={{
-                width: '100%',
-                borderCollapse: 'collapse',
-                fontSize: '0.95em',
-              }}
-            >
-              <thead>
-                <tr style={{ borderBottom: '2px solid #4ECDC4' }}>
-                  <th style={{ padding: '1em', textAlign: 'left', color: '#323C5A', fontWeight: 'bold' }}>Tipo de Desecho</th>
-                  <th style={{ padding: '1em', textAlign: 'left', color: '#323C5A', fontWeight: 'bold' }}>Porcentaje</th>
-                  <th style={{ padding: '1em', textAlign: 'left', color: '#323C5A', fontWeight: 'bold' }}>Kilogramos</th>
-                  <th style={{ padding: '1em', textAlign: 'left', color: '#323C5A', fontWeight: 'bold' }}>Estado</th>
-                </tr>
-              </thead>
-              <tbody>
-                {topWasteData.map((item, idx) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid #e0e0e0' }}>
-                    <td style={{ padding: '1em', color: '#555' }}>{item.name}</td>
-                    <td style={{ padding: '1em', color: '#555' }}>{item.value}%</td>
-                    <td style={{ padding: '1em', color: '#555' }}>{item.kg.toLocaleString()}</td>
-                    <td style={{ padding: '1em' }}>
-                      <span
-                        style={{
-                          backgroundColor: '#d4edda',
-                          color: '#155724',
-                          padding: '0.4em 0.8em',
-                          borderRadius: '6px',
-                          fontSize: '0.85em',
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        ✓ Procesado
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
       </main>
     </div>
   );

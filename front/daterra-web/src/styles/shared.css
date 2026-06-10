@@ -1,0 +1,336 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ========================================
+   SHARED STYLES - Used by Dashboard and MapCiudadano
+   ======================================== */
+
+/* Root Colors and Variables */
+:root {
+  --color-primary-green: #4ee66f;
+  --color-dark-text: #2e354f;
+  --color-danger: #FF6B6B;
+  --color-danger-hover: #e85555;
+  --color-teal: #4ECDC4;
+  --color-blue: #45B7D1;
+  --color-light-bg: #f8f9fa;
+  --color-card-bg: #fff;
+  --color-border-light: rgba(46, 53, 79, 0.1);
+  --color-text-secondary: #666;
+  --color-text-tertiary: #888;
+  
+  --font-family-main: 'Inter', sans-serif;
+  --font-size-base: 1em;
+  --font-size-small: 0.9em;
+  --font-size-xs: 0.8em;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --border-radius-sm: 6px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 15px;
+  
+  --transition-fast: 0.15s ease;
+  --transition-default: 0.2s ease;
+  --transition-slow: 0.3s ease;
+}
+
+/* ========================================
+   SIDEBAR SHARED STYLES
+   ======================================== */
+
+.sidebar-base {
+  background-color: var(--color-primary-green);
+  color: var(--color-dark-text);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  margin-bottom: 2.5em;
+  border-bottom: 1px solid var(--color-border-light);
+  padding-bottom: 1.2em;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 1.3em;
+  font-weight: 600;
+}
+
+.sidebar-nav-item {
+  background-color: rgba(76, 120, 92, 0.15);
+  padding: 0.8em 1em;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  color: var(--color-dark-text);
+  cursor: pointer;
+  transition: background-color var(--transition-default);
+}
+
+.sidebar-nav-item:hover {
+  background-color: rgba(76, 120, 92, 0.25);
+}
+
+.sidebar-footer {
+  border-top: 1px solid var(--color-border-light);
+  padding-top: 1.2em;
+}
+
+.sidebar-user-info {
+  margin-bottom: 1.2em;
+  font-size: 0.85em;
+  color: var(--color-dark-text);
+}
+
+.sidebar-user-info strong {
+  display: block;
+  font-weight: bold;
+}
+
+/* ========================================
+   BUTTON SHARED STYLES
+   ======================================== */
+
+.btn-logout {
+  width: 100%;
+  padding: 0.7em;
+  background-color: var(--color-danger);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-weight: bold;
+  font-size: var(--font-size-small);
+  transition: background-color var(--transition-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+}
+
+.btn-logout:hover {
+  background-color: var(--color-danger-hover);
+}
+
+.btn-base {
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-weight: bold;
+  transition: all var(--transition-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  color: var(--color-dark-text);
+  cursor: pointer;
+  font-size: 1.5em;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========================================
+   CARD SHARED STYLES
+   ======================================== */
+
+.card {
+  background-color: var(--card-bg);
+  padding: 1.5em;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-with-accent {
+  border-left: 5px solid;
+}
+
+.card-header {
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 2em;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.card-header h1 {
+  margin: 0;
+  color: #323C5A;
+  font-size: 2.5em;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.card-header p {
+  margin: 0.5em 0 0 0;
+  color: var(--color-text-secondary);
+}
+
+/* ========================================
+   TYPOGRAPHY SHARED STYLES
+   ======================================== */
+
+
+h1, h2, h3 {
+  font-weight: bold;
+}
+
+h2 {
+  color: #323C5A;
+  font-size: 1.3em;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.text-muted {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs);
+  font-weight: bold;
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+}
+
+/* ========================================
+   LAYOUT SHARED STYLES
+   ======================================== */
+
+.container-main {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-header {
+  color: #fff;
+  padding: 1em 2em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* ========================================
+   FILTER AND LABEL STYLES
+   ======================================== */
+
+.filter-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 0.8em;
+}
+
+.filter-btn {
+  padding: 8px 0;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.78em;
+  cursor: pointer;
+  font-weight: 600;
+  text-align: center;
+  background-color: #f7fafc;
+  color: #4a5568;
+  transition: all var(--transition-fast);
+}
+
+.filter-btn.active {
+  background-color: #4c785c;
+  color: #fff;
+}
+
+.label-small {
+  font-size: 0.8em;
+  color: #718096;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* ========================================
+   ALERT/INFO BOX STYLES
+   ======================================== */
+
+.alert-warning {
+  background-color: #fff3cd;
+  padding: 1.5em;
+  border-radius: var(--border-radius-md);
+  border: 1px solid #ffc107;
+  display: flex;
+  gap: 1em;
+  align-items: start;
+}
+
+.alert-info {
+  background-color: #e8f5e9;
+  padding: 1.5em;
+  border-radius: var(--border-radius-md);
+  border-left: 5px solid;
+  box-shadow: var(--shadow-sm);
+}
+
+.alert-info-content {
+  display: flex;
+  gap: 1em;
+  align-items: start;
+}
+
+/* ========================================
+   MISC SHARED STYLES
+   ======================================== */
+
+.loading-text {
+  color: var(--color-text-secondary);
+}
+
+.divider {
+  border-top: 1px solid var(--color-border-light);
+}
+
+.point-type-badge {
+  font-size: 0.65em;
+  padding: 3px 8px;
+  border-radius: var(--border-radius-sm);
+  font-weight: bold;
+}
+
+.point-type-badge.clean {
+  background-color: #e6fffa;
+  color: #047481;
+}
+
+.point-type-badge.green {
+  background-color: #ebf8ff;
+  color: #2b6cb0;
+}

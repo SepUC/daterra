@@ -1,6 +1,5 @@
 @import url("fontawesome-all.min.css");
-@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic,400,400italic");
-
+	@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 /*
 	Photon by HTML5 UP
 	html5up.net | @ajlkn
@@ -99,7 +98,7 @@ input, select, textarea {
 
 	body, input, select, textarea {
 		color: #666;
-		font-family: "Source Sans Pro", Helvetica, sans-serif;
+		font-family: "Inter", Helvetica, sans-serif;
 		font-size: 16pt;
 		font-weight: 300;
 		line-height: 1.65em;
@@ -3510,3 +3509,28 @@ input, select, textarea {
 			}
 
 	}
+/* --- AÑADE ESTO AL FINAL PARA ARREGLAR LOS INPUTS --- */
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+select,
+textarea {
+	color: #000000 !important; /* Letra negra */
+	background-color: #ffffff !important; /* Fondo blanco */
+	border: solid 1px #ccc !important; /* Borde gris suave para que se vea el cuadro */
+}
+
+/* Para que el texto que escribes se vea negro mientras escribes */
+input:focus, select:focus, textarea:focus {
+	color: #000000 !important;
+	background-color: #ffffff !important;
+	border-color: #6bd479 !important; /* Borde verde al hacer clic */
+}
+
+/* Color del texto de sugerencia (Placeholder) */
+::placeholder {
+	color: #888888 !important;
+	opacity: 1;
+}

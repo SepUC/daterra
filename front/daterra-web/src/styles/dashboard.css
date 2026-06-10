@@ -1,0 +1,485 @@
+/* ========================================
+   DASHBOARD SPECIFIC STYLES
+   ======================================== */
+
+/* Main Dashboard Container */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Sidebar - Dashboard variant */
+.dashboard-sidebar {
+  /* 1. Lo saca del flujo normal y lo fija a la pantalla */
+  position: fixed; 
+  
+  /* 2. Lo ancla desde el tope hasta abajo, cubriendo la altura del navbar */
+  top: 0; 
+  left: 0;
+  height: 100vh; /* 100% del alto del Viewport (pantalla) */
+  
+  /* 3. Asegura que pase por encima del Navbar */
+  z-index: 9999; /* Este valor debe ser mayor al z-index de tu Navbar global */
+  
+  /* 4. Mantiene el scroll interno si el menú es muy largo */
+  overflow-y: auto; 
+  
+  /* Tus otros estilos como background-color, transitions, etc. */
+  transition: width 0.3s ease; 
+  width: 280px;
+  background-color: #4ee66f;
+  color: #2e354f;
+  padding: 2em 1em;
+  transition: width 0.3s ease;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-sidebar.collapsed {
+  width: 80px;
+}
+
+.sidebar-title-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2em;
+  padding-bottom: 1.5em;
+  border-bottom: 1px solid rgba(46, 53, 79, 0.1);
+}
+
+.sidebar-title-section h2 {
+  margin: 0;
+  font-size: 1.5em;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.sidebar-toggle-btn {
+  background: none;
+  border: none;
+  color: #2e354f;
+  cursor: pointer;
+  font-size: 1.5em;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Navigation in sidebar */
+.dashboard-nav {
+  margin-bottom: 3em;
+}
+
+.nav-item {
+  padding: 1em;
+  border-radius: 8px;
+  background-color: rgba(46, 53, 79, 0.1);
+  margin-bottom: 1em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75em;
+  transition: background-color 0.2s;
+}
+
+.nav-item:hover {
+  background-color: rgba(76, 120, 92, 0.2);
+}
+
+/* User section at bottom of sidebar */
+.sidebar-user-section {
+  position: absolute;
+  bottom: 2em;
+  left: 1em;
+  right: 1em;
+  border-top: 1px solid rgba(46, 53, 79, 0.1);
+  padding-top: 1.5em;
+}
+
+.user-info-block {
+  margin-bottom: 1.5em;
+}
+
+.user-info-block p {
+  margin: 0;
+  color: #2e354f;
+}
+
+.user-info-label {
+  font-size: 0.9em;
+  opacity: 0.8;
+  margin-bottom: 0.5em;
+}
+
+.user-info-name {
+  font-weight: bold;
+  word-break: break-word;
+  margin-bottom: 0.3em;
+}
+
+.user-role {
+  font-size: 0.8em;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+/* Main content area */
+.dashboard-main {
+  margin-left: 280px; 
+  min-height: 100vh;
+  padding: 20px; /* Ajusta el padding según necesites */
+  transition: margin-left 0.3s ease; /* Debe coincidir con la transición del sidebar */
+  margin-left: 280px;
+  flex: 1;
+  padding: 2em;
+  transition: margin-left 0.3s ease;
+}
+
+.dashboard-main.sidebar-collapsed {
+  margin-left: 80px;
+}
+
+/* User Security Info Section */
+.dashboard-security-section {
+  margin-bottom: 2em;
+}
+
+.security-card {
+  background-color: #e8f5e9;
+  padding: 1.5em;
+  border-radius: 12px;
+  border-left: 5px solid;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 1em;
+  align-items: start;
+}
+
+.security-card-icon {
+  margin-top: 0.2em;
+}
+
+.security-card-content {
+  flex: 1;
+}
+
+.security-card-content h3 {
+  margin: 0 0 0.5em 0;
+  color: #333;
+}
+
+.security-card-content p {
+  margin: 0 0 0.3em 0;
+  color: #666;
+  font-size: 0.95em;
+}
+
+.security-card-permissions {
+  margin: 0.5em 0 0 0;
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* KPI Cards Section */
+.kpi-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5em;
+  margin-bottom: 2em;
+}
+
+.kpi-card {
+  background-color: #fff;
+  padding: 1.5em;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid;
+}
+
+.kpi-label {
+  margin: 0;
+  color: #888;
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
+.kpi-value {
+  margin: 0.5em 0 0 0;
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+/* ========================================================
+   SISTEMA DE GRILLA RESPONSIVA PARA EL DASHBOARD
+   ======================================================== */
+
+.charts-section {
+  display: grid;
+  /* Crea columnas que se auto-ajustan. Nunca serán menores a 450px */
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 2rem; /* Espaciado uniforme entre los gráficos */
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.chart-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  /* Esta línea es el "truco mágico" para evitar que Recharts desborde el Grid */
+  min-width: 0; 
+}
+
+.chart-card h2 {
+  display: flex;
+  align-items: center;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+/* Table Section */
+.table-section {
+  background-color: #fff;
+  padding: 2em;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2em;
+}
+
+.table-section h2 {
+  margin: 0 0 1.5em 0;
+  color: #323C5A;
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.dashboard-table thead {
+  border-bottom: 2px solid #4ECDC4;
+}
+
+.dashboard-table th {
+  padding: 1em;
+  text-align: left;
+  color: #323C5A;
+  font-weight: bold;
+}
+
+.dashboard-table td {
+  padding: 1em;
+  color: #555;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.table-status-badge {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 0.4em 0.8em;
+  border-radius: 6px;
+  font-size: 0.85em;
+  font-weight: bold;
+}
+
+.table-empty-row {
+  text-align: center;
+  color: #777;
+  padding: 1.5em 1em;
+}
+
+.table-footnote {
+  margin: 1rem 0 0;
+  color: #666;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.dashboard-status-card {
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid transparent;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-status-card__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-status-card--loading {
+  background: linear-gradient(135deg, rgba(78, 205, 196, 0.14), rgba(69, 183, 209, 0.12));
+  border-color: rgba(78, 205, 196, 0.28);
+}
+
+.dashboard-status-card--error {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 160, 122, 0.12));
+  border-color: rgba(255, 107, 107, 0.3);
+}
+
+.dashboard-status-card--empty {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.12), rgba(255, 224, 130, 0.12));
+  border-color: rgba(255, 193, 7, 0.25);
+}
+
+.dashboard-status-card__retry {
+  appearance: none;
+  border: none;
+  background: #2e354f;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dashboard-status-card__retry:hover {
+  background: #1f2538;
+}
+
+.chart-empty-state {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #666;
+  background: linear-gradient(180deg, rgba(248, 249, 250, 0.95), rgba(255, 255, 255, 0.95));
+  border: 1px dashed #cfd8dc;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+/* ========================================================
+   MEDIA QUERIES (Puntos de quiebre por tamaño de pantalla)
+   ======================================================== */
+
+/* Pantallas grandes (Monitores): Hacemos que el gráfico de barras principal ocupe toda la fila */
+@media (min-width: 1200px) {
+  .charts-section .chart-card:first-child {
+    grid-column: 1 / -1; /* Ocupa desde la primera hasta la última columna */
+  }
+}
+
+/* Tablets pequeñas y Celulares: Forzamos una sola columna */
+@media (max-width: 768px) {
+  .charts-section {
+    grid-template-columns: 1fr; /* 1 sola columna */
+    gap: 1.5rem;
+  }
+  
+  .chart-card {
+    padding: 1rem;
+  }
+  
+  /* Ajustamos el tamaño de la cabecera en celulares */
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  
+  /* El selector de año pasa abajo en celulares */
+  .card-header > div:last-child {
+    margin-top: 1rem;
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.kpi-card .kpi-label {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Access Warning Section */
+.access-warning {
+  background-color: #fff3cd;
+  padding: 1.5em;
+  border-radius: 12px;
+  border: 1px solid #ffc107;
+  display: flex;
+  gap: 1em;
+  align-items: start;
+  margin-bottom: 2em;
+}
+
+.access-warning-icon {
+  color: #ff9800;
+  margin-top: 0.2em;
+  flex-shrink: 0;
+}
+
+.access-warning-content p {
+  margin: 0;
+  color: #333;
+}
+
+.access-warning-content p:first-child {
+  margin-bottom: 0.5em;
+  font-weight: bold;
+}
+
+.access-warning-content p:last-child {
+  color: #666;
+}
+
+/* Tooltip-like styling for Recharts */
+.recharts-tooltip {
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.5em;
+}
+
+/* Legend / Axis text overlap fixes (Recharts) */
+.chart-card .recharts-legend-wrapper {
+  max-width: 100%;
+}
+
+.chart-card .recharts-default-legend {
+  font-size: 0.78em;
+}
+
+.chart-card .recharts-legend-item {
+  margin-right: 0.75rem;
+}
+
+.chart-card .recharts-legend-item-text,
+.chart-card .recharts-legend-item-text tspan {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.chart-card .recharts-cartesian-axis-tick-value {
+  font-size: 0.78em;
+}
+
