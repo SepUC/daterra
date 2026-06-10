@@ -12,6 +12,22 @@
 
 /* Sidebar - Dashboard variant */
 .dashboard-sidebar {
+  /* 1. Lo saca del flujo normal y lo fija a la pantalla */
+  position: fixed; 
+  
+  /* 2. Lo ancla desde el tope hasta abajo, cubriendo la altura del navbar */
+  top: 0; 
+  left: 0;
+  height: 100vh; /* 100% del alto del Viewport (pantalla) */
+  
+  /* 3. Asegura que pase por encima del Navbar */
+  z-index: 9999; /* Este valor debe ser mayor al z-index de tu Navbar global */
+  
+  /* 4. Mantiene el scroll interno si el menú es muy largo */
+  overflow-y: auto; 
+  
+  /* Tus otros estilos como background-color, transitions, etc. */
+  transition: width 0.3s ease; 
   width: 280px;
   background-color: #4ee66f;
   color: #2e354f;
@@ -120,6 +136,10 @@
 
 /* Main content area */
 .dashboard-main {
+  margin-left: 280px; 
+  min-height: 100vh;
+  padding: 20px; /* Ajusta el padding según necesites */
+  transition: margin-left 0.3s ease; /* Debe coincidir con la transición del sidebar */
   margin-left: 280px;
   flex: 1;
   padding: 2em;
@@ -200,31 +220,36 @@
   font-weight: bold;
 }
 
-/* Charts Section */
+/* ========================================================
+   SISTEMA DE GRILLA RESPONSIVA PARA EL DASHBOARD
+   ======================================================== */
+
 .charts-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
-  gap: 2em;
-  margin-bottom: 2em;
-  align-items: start;
+  /* Crea columnas que se auto-ajustan. Nunca serán menores a 450px */
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 2rem; /* Espaciado uniforme entre los gráficos */
+  width: 100%;
+  margin-top: 1.5rem;
 }
 
 .chart-card {
-  background-color: #fff;
-  padding: 2em;
+  background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  /* Esta línea es el "truco mágico" para evitar que Recharts desborde el Grid */
+  min-width: 0; 
 }
 
 .chart-card h2 {
-  margin: 0 0 1.5em 0;
-  color: #323C5A;
-  font-size: 1.3em;
-  font-weight: bold;
   display: flex;
   align-items: center;
-  gap: 0.5em;
-  line-height: 1.2;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #333;
 }
 
 /* Table Section */
@@ -351,22 +376,39 @@
   padding: 1rem;
 }
 
-@media (max-width: 900px) {
+/* ========================================================
+   MEDIA QUERIES (Puntos de quiebre por tamaño de pantalla)
+   ======================================================== */
+
+/* Pantallas grandes (Monitores): Hacemos que el gráfico de barras principal ocupe toda la fila */
+@media (min-width: 1200px) {
+  .charts-section .chart-card:first-child {
+    grid-column: 1 / -1; /* Ocupa desde la primera hasta la última columna */
+  }
+}
+
+/* Tablets pequeñas y Celulares: Forzamos una sola columna */
+@media (max-width: 768px) {
   .charts-section {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* 1 sola columna */
+    gap: 1.5rem;
   }
-
+  
   .chart-card {
-    padding: 1.5em;
+    padding: 1rem;
   }
-
-  .table-section {
-    padding: 1.5em;
+  
+  /* Ajustamos el tamaño de la cabecera en celulares */
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start !important;
   }
-
-  .chart-card h2,
-  .table-section h2 {
-    font-size: 1.15em;
+  
+  /* El selector de año pasa abajo en celulares */
+  .card-header > div:last-child {
+    margin-top: 1rem;
+    width: 100%;
+    justify-content: space-between;
   }
 }
 

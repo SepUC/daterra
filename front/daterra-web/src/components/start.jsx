@@ -14,7 +14,6 @@ function Start() {
 					<p>Por un mundo más
 					 sostenible, más informado</p>
 					<ul class="actions special">
-						<li><a href="/register" class="button scrolly">Regístrate</a></li>
 						<li><a href="/about" class="button scrolly">Aprende más</a></li>
 					</ul>
 				</div>
@@ -25,8 +24,7 @@ function Start() {
 					<div class="row gtr-150">
 						<div class="col-6 col-12-medium">
 							<header class="major">
-								<h2>Para municipalidades y la gente<br />
-								texto</h2>
+								<h2>Para municipalidades y la gente</h2>
 							</header>
 							<p>La solución para gestionar desechos y transparencia para los ciudadanos. Daterra es la plataforma ideal para mejorar la interpretación de tus desechos declarados. Para un mejor planeta.</p>
 						</div>
