@@ -2,7 +2,6 @@
  * API Service - Maneja todas las conexiones con el backend AWS
  * Soporta autenticación, gestión de usuarios y datos de desechos
  */
-
 const API_URL = import.meta.env.DEV
   ? '/api'
   : (import.meta.env.VITE_API_URL || 'http://localhost:8080/api');
@@ -56,7 +55,6 @@ class APIService {
    * AUTENTICACIÓN
    */
 
-  // Registro de usuario
   async register(name, email, password) {
     return this.request('/auth/register', {
       method: 'POST',
@@ -64,7 +62,6 @@ class APIService {
     });
   }
 
-  // Login de usuario
   async login(email, password) {
     return this.request('/auth/login', {
       method: 'POST',
@@ -72,12 +69,10 @@ class APIService {
     });
   }
 
-  // Logout
   async logout() {
     return this.request('/auth/logout', { method: 'POST' });
   }
 
-  // Verificar token
   async verifyToken() {
     return this.request('/auth/verify', { method: 'GET' });
   }
@@ -86,12 +81,10 @@ class APIService {
    * USUARIOS
    */
 
-  // Obtener perfil del usuario autenticado
   async getUserProfile() {
     return this.request('/users/profile', { method: 'GET' });
   }
 
-  // Actualizar perfil del usuario
   async updateUserProfile(data) {
     return this.request('/users/profile', {
       method: 'PUT',
@@ -103,43 +96,35 @@ class APIService {
    * DESECHOS
    */
 
-  // Obtener datos de desechos reciclados por mes
   async getMonthlyWasteData() {
     return this.request('/waste/monthly', { method: 'GET' });
   }
 
-  // Obtener desechos más reciclados
   async getTopWasteTypes() {
     return this.request('/waste/top-types', { method: 'GET' });
   }
 
-  // Obtener resumen agregado de residuos por región
   async getWasteByRegions() {
     return this.request('/sinader/regiones', { method: 'GET' });
   }
 
-  // Obtener resumen agregado de residuos por tratamiento
   async getWasteByTreatments() {
     return this.request('/sinader/tratamientos', { method: 'GET' });
   }
 
-  // Obtener el paquete de datos necesario para el dashboard de residuos
   async getWasteDashboardData() {
     const [regions, treatments] = await Promise.all([
       this.getWasteByRegions(),
       this.getWasteByTreatments(),
     ]);
-
     return { regions, treatments };
   }
 
-  // Obtener todos los registros de desechos
   async getWasteRecords(filters = {}) {
     const params = new URLSearchParams(filters);
     return this.request(`/waste/records?${params}`, { method: 'GET' });
   }
 
-  // Registrar nuevo desecho
   async recordWaste(data) {
     return this.request('/waste/record', {
       method: 'POST',
@@ -151,12 +136,16 @@ class APIService {
    * ESTADÍSTICAS
    */
 
-  // Obtener estadísticas generales
+  // NUEVO: Obtener estadísticas de la Región Metropolitana (SINADER) con o sin año
+  async getEstadisticasRM(ano = null) {
+    const endpoint = ano ? `/sinader/estadisticas/rm/${ano}` : '/sinader/estadisticas/rm';
+    return this.request(endpoint, { method: 'GET' });
+  }
+
   async getStatistics() {
     return this.request('/statistics', { method: 'GET' });
   }
 
-  // Obtener objetivos y progreso
   async getGoalsAndProgress() {
     return this.request('/goals/progress', { method: 'GET' });
   }

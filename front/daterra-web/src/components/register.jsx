@@ -6,7 +6,7 @@ import '../assets/css/main.css';
 import '../assets/css/fontawesome-all.min.css';
 
 function Register() {
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     email: '',
     runUsuario: '',
     dvrunUsuario: '',
@@ -17,8 +17,6 @@ function Register() {
     direccion: '',
     telefono: '',
     password: '',
-    idTipoUsu: 2, // Por defecto Ciudadano (General)
-    idComuna: 1,  // Por defecto Santiago
     confirmPassword: ''
   });
 
@@ -42,12 +40,11 @@ function Register() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Forzamos a que los IDs y el RUN se procesen como enteros numéricos
-    const numericFields = ['idTipoUsu', 'idComuna', 'runUsuario'];
-
+    
+    // Forzamos a que el RUN se procese como número entero
     setFormData({
       ...formData,
-      [name]: numericFields.includes(name) ? parseInt(value) || '' : value
+      [name]: name === 'runUsuario' ? parseInt(value) || '' : value
     });
     setError('');
   };
@@ -55,7 +52,7 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validación básica de espacios vacíos simulados con barras espaciadoras
+    // Validación básica
     if (!formData.primerNombre.trim() || !formData.email.trim() || !formData.primerApellido.trim()) {
       setError('Los campos obligatorios no pueden contener solo espacios vacíos.');
       return;
@@ -68,10 +65,33 @@ function Register() {
 
     setIsLoading(true);
     try {
-      // Extraemos confirmPassword para enviar solo los datos de la DB
-      const { confirmPassword, ...datosParaEnviar } = formData;
+      // 1. Lógica de verificación de dominio de correo
+      const domain = formData.email.includes('@') 
+        ? formData.email.split('@')[1].toLowerCase() 
+        : '';
 
-      // Enviamos el objeto JSON plano directo al AuthContext
+      let computedTipoUsu = 2; // 2 = Ciudadano (Genérico) por defecto
+      let computedComuna = 1;  // 1 = Santiago por defecto
+
+      // Aquí puedes agregar un diccionario o más sentencias if para otros municipios
+      if (domain === 'metropolitana.cl') {
+        computedTipoUsu = 1; // 1 = Municipal
+        computedComuna = 1;  // Santiago (o el ID que represente la RM)
+      } else if (domain === 'puentealto.cl') {
+        computedTipoUsu = 1; // 1 = Municipal
+        computedComuna = 2;  // Puente Alto
+      }
+
+      // 2. Extraemos confirmPassword y ensamblamos el objeto final
+      const { confirmPassword, ...datosBase } = formData;
+      
+      const datosParaEnviar = {
+        ...datosBase,
+        idTipoUsu: computedTipoUsu,
+        idComuna: computedComuna
+      };
+
+      // 3. Enviamos el objeto JSON plano directo al AuthContext
       await register(datosParaEnviar);
       navigate('/dashboard');
     } catch (err) {
@@ -330,49 +350,7 @@ function Register() {
                   />
                 </div>
 
-                {/* PERFIL Y LOCALIZACIÓN - Sección 5 */}
-                <div className="col-12">
-                  <h3 style={{ color: '#333', marginBottom: '1em', fontSize: '1.2em', borderBottom: '2px solid #16a085', paddingBottom: '0.5em' }}>
-                    <i className="fas fa-building" style={{ marginRight: '0.5em', color: '#16a085' }}></i>
-                    Perfil y Localización
-                  </h3>
-                </div>
 
-                <div className="col-6 col-12-small" style={{ marginBottom: '0.5em' }}>
-                  <label htmlFor="idTipoUsu" style={{ display: 'block', color: '#555', fontWeight: '500', marginBottom: '0.3em', fontSize: '0.95em' }}>
-                    Tipo de Usuario <span style={{ color: '#e74c3c' }}>*</span>
-                  </label>
-                  <select
-                      name="idTipoUsu"
-                      id="idTipoUsu"
-                      value={formData.idTipoUsu}
-                      onChange={handleChange}
-                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#333' }}
-                      required
-                      disabled={isLoading}
-                  >
-                    <option value={2}>General (Ciudadano)</option>
-                    <option value={1}>Municipal (Comuna)</option>
-                  </select>
-                </div>
-
-                <div className="col-6 col-12-small" style={{ marginBottom: '2em' }}>
-                  <label htmlFor="idComuna" style={{ display: 'block', color: '#555', fontWeight: '500', marginBottom: '0.3em', fontSize: '0.95em' }}>
-                    Comuna <span style={{ color: '#e74c3c' }}>*</span>
-                  </label>
-                  <select
-                      name="idComuna"
-                      id="idComuna"
-                      value={formData.idComuna}
-                      onChange={handleChange}
-                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#333' }}
-                      required
-                      disabled={isLoading}
-                  >
-                    <option value={1}>Santiago</option>
-                    <option value={2}>Puente Alto</option>
-                  </select>
-                </div>
 
                 {/* BOTÓN DE ENVÍO */}
                 <div className="col-12">
