@@ -3,6 +3,7 @@ package com.daterra.api.daterra.controller;
 import com.daterra.api.daterra.dto.SinaderEstadisticasDTO;
 import com.daterra.api.daterra.repository.SinaderEstadisticasRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -127,17 +128,25 @@ public class SinaderRM {
     }
 
     @GetMapping("/rm/materiales/por-año/{año}")
-    public List<Map<String, Object>> getMaterialesPorAñoFiltrado(@PathVariable Integer año) {
+    public ResponseEntity<?> getMaterialesPorAñoFiltrado(@PathVariable Integer año) {
+        List<Object[]> resultados = repository.materialPorAñoFiltrado(año);
+
+        // Si la lista está vacía, enviamos un mensaje claro
+        if (resultados == null || resultados.isEmpty()) {
+            return ResponseEntity.ok("No se encontraron registros para el año: " + año +
+                    ". Revisa si la columna 'año' en la vista es realmente un entero.");
+        }
+
         List<Map<String, Object>> list = new ArrayList<>();
-        for (Object[] r : repository.materialPorAñoFiltrado(año)) {
+        for (Object[] r : resultados) {
             Map<String, Object> m = new LinkedHashMap<>();
-            m.put("año",            r[0]);
-            m.put("material",       r[1]);
-            m.put("registros",      r[2]);
+            m.put("año", r[0]);
+            m.put("material", r[1]);
+            m.put("registros", r[2]);
             m.put("totalToneladas", r[3] != null ? ((Number) r[3]).doubleValue() : 0);
             list.add(m);
         }
-        return list;
+        return ResponseEntity.ok(list);
     }
 
 }

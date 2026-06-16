@@ -12,8 +12,8 @@ public class ImportarSinader {
     static final String PASSWORD = "daterra123";
     // ────────────────────────────────────────────────────────────────
 
-    static final String CSV_FILE = "C:/Users/Jose/Downloads/RETC_EXCEL/gm-sinader-2014-fixed (1).csv";
-    static final String TABLE    = "SINADER_2014";
+    static final String CSV_FILE = "C:/Users/Jose/Downloads/RETC_EXCEL/gm-sinader-2024-fixed.csv";
+    static final String TABLE    = "SINADER_2024";
     static final int    BATCH    = 500;
 
     static final Set<String> COMMA_TO_DOT = new HashSet<>(Arrays.asList(
