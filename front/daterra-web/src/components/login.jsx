@@ -80,6 +80,7 @@ function Login() {
                       id="email"
                       placeholder="Correo electrónico"
                       value={email}
+                      maxLength={50}
                       onChange={(e) => {
                         setEmail(e.target.value);
                         setError('');
@@ -97,6 +98,7 @@ function Login() {
                         id="password"
                         placeholder="Contraseña"
                         value={password}
+                        maxLength={50}
                         onChange={(e) => {
                           setPassword(e.target.value);
                           setError('');

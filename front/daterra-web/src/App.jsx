@@ -113,7 +113,7 @@ function App() {
         <footer class="bg-light text-center text-lg-start">
           <div class="text-center p-3" style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
             © 2026 Copyright:
-            <a class="text-dark" href="https://m.media-amazon.com/images/I/61XmTyKs7sL.jpg">Daterra.com</a>
+            <a class="text-dark" href="#">Daterra.com</a>
           </div>
         </footer>
       </Router>

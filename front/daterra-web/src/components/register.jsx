@@ -136,6 +136,7 @@ const [formData, setFormData] = useState({
                       id="email"
                       placeholder="tu@email.com"
                       value={formData.email}
+                      maxLength={50}
                       onChange={handleChange}
                       style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#333' }}
                       required
@@ -154,6 +155,7 @@ const [formData, setFormData] = useState({
                         id="password"
                         placeholder="Mínimo 6 caracteres"
                         value={formData.password}
+                        maxLength={50}
                         onChange={handleChange}
                         style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#333', paddingRight: '40px' }}
                         required
@@ -179,6 +181,7 @@ const [formData, setFormData] = useState({
                         id="confirmPassword"
                         placeholder="Repite tu contraseña"
                         value={formData.confirmPassword}
+                        maxLength={50}
                         onChange={handleChange}
                         style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#333', paddingRight: '40px' }}
                         required
@@ -211,6 +214,7 @@ const [formData, setFormData] = useState({
                       id="primerNombre"
                       placeholder="Tu primer nombre"
                       value={formData.primerNombre}
+                      maxLength={50}
                       onChange={handleChange}
                       style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#333' }}
                       required
@@ -228,6 +232,7 @@ const [formData, setFormData] = useState({
                       id="segundoNombre"
                       placeholder="Tu segundo nombre (opcional)"
                       value={formData.segundoNombre}
+                      maxLength={50}
                       onChange={handleChange}
                       style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#333' }}
                       disabled={isLoading}
@@ -244,6 +249,7 @@ const [formData, setFormData] = useState({
                       id="primerApellido"
                       placeholder="Apellido paterno"
                       value={formData.primerApellido}
+                      maxLength={50}
                       onChange={handleChange}
                       style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#333' }}
                       required
@@ -261,6 +267,7 @@ const [formData, setFormData] = useState({
                       id="segundoApellido"
                       placeholder="Apellido materno (opcional)"
                       value={formData.segundoApellido}
+                      maxLength={50}
                       onChange={handleChange}
                       style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#333' }}
                       disabled={isLoading}
@@ -280,11 +287,14 @@ const [formData, setFormData] = useState({
                     RUN <span style={{ color: '#e74c3c' }}>*</span>
                   </label>
                   <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
                       name="runUsuario"
                       id="runUsuario"
                       placeholder="Sin puntos ni guión"
                       value={formData.runUsuario}
+                      maxLength={8}
                       onChange={handleChange}
                       style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#333' }}
                       required
@@ -303,6 +313,7 @@ const [formData, setFormData] = useState({
                       placeholder="DV"
                       maxLength="1"
                       value={formData.dvrunUsuario}
+                      maxLength={1}
                       onChange={handleChange}
                       style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#333' }}
                       required
@@ -328,6 +339,7 @@ const [formData, setFormData] = useState({
                       id="telefono"
                       placeholder="+56 9 XXXX XXXX"
                       value={formData.telefono}
+                      maxLength={12}
                       onChange={handleChange}
                       style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#333' }}
                       disabled={isLoading}
@@ -344,6 +356,7 @@ const [formData, setFormData] = useState({
                       id="direccion"
                       placeholder="Tu dirección completa"
                       value={formData.direccion}
+                      maxLength={100}
                       onChange={handleChange}
                       style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)', color: '#333' }}
                       disabled={isLoading}
