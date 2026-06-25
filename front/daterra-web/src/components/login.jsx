@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, getUserTypeFromUser } from '../context/AuthContext';
 
 import '../assets/css/main.css';
 import '../assets/css/fontawesome-all.min.css';
@@ -17,7 +17,7 @@ function Login() {
   // Redirigir si ya está autenticado
   useEffect(() => {
     if (isAuthenticated && user) {
-      if (user.idTipoUsu === 2) {
+      if (getUserTypeFromUser(user) === 2) {
         navigate('/mapCiudadano');
       } else {
         navigate('/dashboard');
@@ -44,7 +44,7 @@ function Login() {
       console.log('Login exitoso', userData);
 
       // Condición para redirigir según el tipo de usuario
-      if (userData && userData.idTipoUsu === 2) {
+      if (getUserTypeFromUser(userData) === 2) {
         navigate('/mapCiudadano');
       } else {
         navigate('/dashboard');

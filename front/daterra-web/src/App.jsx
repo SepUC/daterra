@@ -16,6 +16,7 @@ import Dashboard from './components/dashboard.jsx';
 import MapCiudadano from './components/mapCiudadano.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import { getUserTypeFromUser } from './context/AuthContext.jsx';
 function AppContent() {
   const { user, isAuthenticated, logout } = useAuth();
 
@@ -38,7 +39,7 @@ function AppContent() {
                   <Link to="/" style={{ color: '#2e354f', textDecoration: 'none', fontSize: '0.95em', transition: 'all 0.2s', padding: '0.5em 0', fontWeight: '500' }} onMouseEnter={e => { e.target.style.color = '#4c785c'; e.target.style.fontWeight = 'bold'; }} onMouseLeave={e => { e.target.style.color = '#2e354f'; e.target.style.fontWeight = '500'; }}>Inicio</Link>
                   {isAuthenticated ? (
                     <>
-                      {user?.idTipoUsu === 2 ? (
+                      {getUserTypeFromUser(user) === 2 ? (
                         <Link to="/mapCiudadano" style={{ color: '#2e354f', textDecoration: 'none', fontSize: '0.95em', transition: 'all 0.2s', padding: '0.5em 0', fontWeight: '500' }} onMouseEnter={e => { e.target.style.color = '#4c785c'; e.target.style.fontWeight = 'bold'; }} onMouseLeave={e => { e.target.style.color = '#2e354f'; e.target.style.fontWeight = '500'; }}>Consigue tu aplicación</Link>
                       ) : (
                         <Link to="/dashboard" style={{ color: '#2e354f', textDecoration: 'none', fontSize: '0.95em', transition: 'all 0.2s', padding: '0.5em 0', fontWeight: '500' }} onMouseEnter={e => { e.target.style.color = '#4c785c'; e.target.style.fontWeight = 'bold'; }} onMouseLeave={e => { e.target.style.color = '#2e354f'; e.target.style.fontWeight = '500'; }}>Dashboard</Link>

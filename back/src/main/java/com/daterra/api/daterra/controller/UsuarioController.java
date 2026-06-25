@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.daterra.api.daterra.dto.UsuarioResponseDTO;
 import com.daterra.api.daterra.dto.RegistroRequest;
 import com.daterra.api.daterra.model.Usuario;
 import com.daterra.api.daterra.model.TipoUsuario;
@@ -52,7 +53,19 @@ public class UsuarioController {
             }
 
             Usuario nuevoUsuario = usuarioRepository.save(usuario);
-            return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
+            UsuarioResponseDTO response = new UsuarioResponseDTO(
+                    nuevoUsuario.getEmail(),
+                    nuevoUsuario.getRunUsuario(),
+                    nuevoUsuario.getDvrunUsuario(),
+                    nuevoUsuario.getPrimerNombre(),
+                    nuevoUsuario.getSegundoNombre(),
+                    nuevoUsuario.getPrimerApellido(),
+                    nuevoUsuario.getSegundoApellido(),
+                    nuevoUsuario.getDireccion(),
+                    nuevoUsuario.getTelefono(),
+                    nuevoUsuario.getIdComuna()
+            );
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
 
         } catch (Exception e) {
             e.printStackTrace();
