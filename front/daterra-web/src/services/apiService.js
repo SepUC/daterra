@@ -85,6 +85,14 @@ class APIService {
       body: JSON.stringify({ name, email, password }),
     });
   }
+
+  async getEstadisticasRM(año) {
+    if (año === undefined || año === null || año === '') {
+      return this.request('/sinader/estadisticas/rm');
+    }
+
+    return this.request(`/sinader/estadisticas/rm/${año}`);
+  }
 }
 
 export default new APIService();

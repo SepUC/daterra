@@ -5,6 +5,35 @@ import { hasPermission } from '../constants/testUsers';
 
 const AuthContext = createContext();
 
+const resolveUserTypeFromEmail = (email) => {
+  if (!email || !email.includes('@')) return undefined;
+
+  const domain = email.split('@')[1].toLowerCase();
+
+  if (domain === 'metropolitana.cl' || domain === 'puentealto.cl') {
+    return 1;
+  }
+
+  return 2;
+};
+
+const normalizeUser = (userData, fallbackEmail = '') => {
+  if (!userData) return null;
+
+  const email = userData.email || fallbackEmail || '';
+  const displayName = userData.usuario
+    || userData.name
+    || [userData.primerNombre, userData.primerApellido].filter(Boolean).join(' ').trim()
+    || email;
+
+  return {
+    ...userData,
+    email,
+    name: displayName,
+    idTipoUsu: userData.idTipoUsu ?? resolveUserTypeFromEmail(email),
+  };
+};
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,6 +48,7 @@ export function AuthProvider({ children }) {
       } catch (err) {
         console.error('Error restaurando sesión:', err);
         localStorage.removeItem('currentUser');
+        localStorage.removeItem('authToken');
       }
     }
     setIsLoading(false);
@@ -32,15 +62,19 @@ export function AuthProvider({ children }) {
     setError(null);
 
     try {
-      // 2. Llamamos al servicio que usa Axios hacia http://localhost:8080/api/auth/login
+      // 2. Llamamos al servicio de autenticación y normalizamos la sesión local
       const userData = await apiLogin(email, password);
+      const normalizedUser = normalizeUser(userData, email);
 
-      // 3. Guardamos el objeto usuario que viene de Java (Jose Vargas)
-      localStorage.setItem('currentUser', JSON.stringify(userData));
-      setUser(userData);
+      if (userData?.token) {
+        localStorage.setItem('authToken', userData.token);
+      }
+
+      localStorage.setItem('currentUser', JSON.stringify(normalizedUser));
+      setUser(normalizedUser);
 
       setIsLoading(false);
-      return userData;
+      return normalizedUser;
     } catch (err) {
       // El error viene de lo que configuramos en authService.js
       const errorMessage = typeof err === 'string' ? err : 'Credenciales inválidas';
@@ -60,11 +94,18 @@ export function AuthProvider({ children }) {
     try {
       const newUser = await apiRegister(userData);
 
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
-      setUser(newUser);
+      const loginData = await apiLogin(userData.email, userData.password);
+      const normalizedUser = normalizeUser({ ...newUser, ...loginData }, userData.email);
+
+      if (loginData?.token) {
+        localStorage.setItem('authToken', loginData.token);
+      }
+
+      localStorage.setItem('currentUser', JSON.stringify(normalizedUser));
+      setUser(normalizedUser);
 
       setIsLoading(false);
-      return newUser;
+      return normalizedUser;
     } catch (err) {
       setError(err);
       setIsLoading(false);
@@ -74,6 +115,7 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
     setUser(null);
   };
 
