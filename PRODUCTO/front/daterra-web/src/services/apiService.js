@@ -3,7 +3,7 @@
  */
 const API_URL = import.meta.env.DEV
     ? '/api'
-    : (import.meta.env.VITE_API_URL || 'http://localhost:8080/api');
+    : (import.meta.env.VITE_API_URL || 'https://daterra-75j1.onrender.com/api');
 const TIMEOUT = import.meta.env.VITE_REQUEST_TIMEOUT || 10000;
 
 class APIService {
