@@ -17,6 +17,11 @@ const resolveUserTypeFromEmail = (email) => {
   return 2;
 };
 
+export const getUserTypeFromUser = (userData) => {
+  if (!userData) return undefined;
+  return resolveUserTypeFromEmail(userData.email);
+};
+
 const normalizeUser = (userData, fallbackEmail = '') => {
   if (!userData) return null;
 
@@ -27,10 +32,16 @@ const normalizeUser = (userData, fallbackEmail = '') => {
     || email;
 
   return {
-    ...userData,
     email,
     name: displayName,
-    idTipoUsu: userData.idTipoUsu ?? resolveUserTypeFromEmail(email),
+    runUsuario: userData.runUsuario,
+    dvrunUsuario: userData.dvrunUsuario,
+    primerNombre: userData.primerNombre,
+    segundoNombre: userData.segundoNombre,
+    primerApellido: userData.primerApellido,
+    segundoApellido: userData.segundoApellido,
+    direccion: userData.direccion,
+    telefono: userData.telefono,
   };
 };
 
@@ -44,7 +55,7 @@ export function AuthProvider({ children }) {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        setUser(normalizeUser(JSON.parse(storedUser)));
       } catch (err) {
         console.error('Error restaurando sesión:', err);
         localStorage.removeItem('currentUser');

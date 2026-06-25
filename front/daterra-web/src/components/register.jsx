@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, getUserTypeFromUser } from '../context/AuthContext';
 
 import '../assets/css/main.css';
 import '../assets/css/fontawesome-all.min.css';
@@ -30,7 +30,7 @@ const [formData, setFormData] = useState({
   // Redirigir si ya está autenticado
   useEffect(() => {
     if (isAuthenticated && user) {
-      if (user.idTipoUsu === 2) {
+      if (getUserTypeFromUser(user) === 2) {
         navigate('/mapCiudadano');
       } else {
         navigate('/dashboard');
@@ -70,15 +70,12 @@ const [formData, setFormData] = useState({
         ? formData.email.split('@')[1].toLowerCase() 
         : '';
 
-      let computedTipoUsu = 2; // 2 = Ciudadano (Genérico) por defecto
       let computedComuna = 1;  // 1 = Santiago por defecto
 
       // Aquí puedes agregar un diccionario o más sentencias if para otros municipios
       if (domain === 'metropolitana.cl') {
-        computedTipoUsu = 1; // 1 = Municipal
         computedComuna = 1;  // Santiago (o el ID que represente la RM)
       } else if (domain === 'puentealto.cl') {
-        computedTipoUsu = 1; // 1 = Municipal
         computedComuna = 2;  // Puente Alto
       }
 
@@ -87,7 +84,6 @@ const [formData, setFormData] = useState({
       
       const datosParaEnviar = {
         ...datosBase,
-        idTipoUsu: computedTipoUsu,
         idComuna: computedComuna
       };
 

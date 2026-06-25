@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { getUserTypeFromUser } from '../context/AuthContext';
 
 function ProtectedRoute({ children, isAuthenticated, user, requiredUserType }) {
   // Check if user is authenticated
@@ -8,9 +9,10 @@ function ProtectedRoute({ children, isAuthenticated, user, requiredUserType }) {
   }
 
   // Check if user type matches required type
-  if (requiredUserType !== undefined && user?.idTipoUsu !== requiredUserType) {
+  const userType = getUserTypeFromUser(user);
+  if (requiredUserType !== undefined && userType !== requiredUserType) {
     // Redirect to appropriate default page based on user type
-    const defaultRoute = user?.idTipoUsu === 2 ? '/mapCiudadano' : '/dashboard';
+    const defaultRoute = userType === 2 ? '/mapCiudadano' : '/dashboard';
     return <Navigate to={defaultRoute} replace />;
   }
 
