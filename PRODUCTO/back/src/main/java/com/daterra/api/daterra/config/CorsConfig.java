@@ -10,9 +10,10 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("*") // Permite cualquier origen
+                // Cambia el "*" por tu dominio real cuando estés en producción
+                .allowedOriginPatterns("https://daterra-delta.vercel.app", "http://localhost:3000")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true); // Ahora sí puedes permitir credenciales
+                .allowCredentials(true);
     }
 }
